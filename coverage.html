@@ -1,0 +1,1491 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>config: Go Coverage Report</title>
+		<style>
+			body {
+				background: whitesmoke;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: whitesmoke;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">github.com/chris-ramon/golang-scaffolding/config/config.go (0.0%)</option>
+				
+				<option value="file1">github.com/chris-ramon/golang-scaffolding/db/db.go (0.0%)</option>
+				
+				<option value="file2">github.com/chris-ramon/golang-scaffolding/db/models/db.go (0.0%)</option>
+				
+				<option value="file3">github.com/chris-ramon/golang-scaffolding/db/models/query.sql.go (0.0%)</option>
+				
+				<option value="file4">github.com/chris-ramon/golang-scaffolding/domain/admin/dashboard/dashboard.go (0.0%)</option>
+				
+				<option value="file5">github.com/chris-ramon/golang-scaffolding/domain/admin/handler.go (0.0%)</option>
+				
+				<option value="file6">github.com/chris-ramon/golang-scaffolding/domain/admin/layout/layout.go (0.0%)</option>
+				
+				<option value="file7">github.com/chris-ramon/golang-scaffolding/domain/admin/route.go (0.0%)</option>
+				
+				<option value="file8">github.com/chris-ramon/golang-scaffolding/domain/admin/signin/signin.go (0.0%)</option>
+				
+				<option value="file9">github.com/chris-ramon/golang-scaffolding/domain/admin/user/user.go (0.0%)</option>
+				
+				<option value="file10">github.com/chris-ramon/golang-scaffolding/domain/auth/handler.go (100.0%)</option>
+				
+				<option value="file11">github.com/chris-ramon/golang-scaffolding/domain/auth/mappers/mappers.go (0.0%)</option>
+				
+				<option value="file12">github.com/chris-ramon/golang-scaffolding/domain/auth/route.go (100.0%)</option>
+				
+				<option value="file13">github.com/chris-ramon/golang-scaffolding/domain/auth/service.go (100.0%)</option>
+				
+				<option value="file14">github.com/chris-ramon/golang-scaffolding/domain/gql/fields/fields.go (0.0%)</option>
+				
+				<option value="file15">github.com/chris-ramon/golang-scaffolding/domain/gql/fields/util.go (0.0%)</option>
+				
+				<option value="file16">github.com/chris-ramon/golang-scaffolding/domain/gql/handler.go (0.0%)</option>
+				
+				<option value="file17">github.com/chris-ramon/golang-scaffolding/domain/gql/route.go (0.0%)</option>
+				
+				<option value="file18">github.com/chris-ramon/golang-scaffolding/domain/gql/schema/schema.go (0.0%)</option>
+				
+				<option value="file19">github.com/chris-ramon/golang-scaffolding/domain/users/handler.go (0.0%)</option>
+				
+				<option value="file20">github.com/chris-ramon/golang-scaffolding/domain/users/mappers/mappers.go (0.0%)</option>
+				
+				<option value="file21">github.com/chris-ramon/golang-scaffolding/domain/users/repo.go (0.0%)</option>
+				
+				<option value="file22">github.com/chris-ramon/golang-scaffolding/domain/users/route.go (0.0%)</option>
+				
+				<option value="file23">github.com/chris-ramon/golang-scaffolding/domain/users/service.go (0.0%)</option>
+				
+				<option value="file24">github.com/chris-ramon/golang-scaffolding/main.go (0.0%)</option>
+				
+				<option value="file25">github.com/chris-ramon/golang-scaffolding/pkg/ctxutil/ctxutil.go (100.0%)</option>
+				
+				<option value="file26">github.com/chris-ramon/golang-scaffolding/pkg/jwt/jwt.go (0.0%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package config
+
+import "os"
+
+type Config struct {
+        Port string
+}
+
+type DBConfig struct {
+        User    string
+        PWD     string
+        Host    string
+        Name    string
+        SSLMode string
+}
+
+func New() *Config <span class="cov0" title="0">{
+        return &amp;Config{
+                Port: os.Getenv("PORT"),
+        }
+}</span>
+
+func NewDBConfig() *DBConfig <span class="cov0" title="0">{
+        return &amp;DBConfig{
+                User:    os.Getenv("DB_USER"),
+                PWD:     os.Getenv("DB_PWD"),
+                Host:    os.Getenv("DB_HOST"),
+                Name:    os.Getenv("DB_NAME"),
+                SSLMode: os.Getenv("DB_SSL_MODE"),
+        }
+}</span>
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package db
+
+import (
+        "context"
+        "database/sql"
+        "embed"
+        "fmt"
+
+        "github.com/golang-migrate/migrate/v4"
+        "github.com/golang-migrate/migrate/v4/database/postgres"
+        "github.com/golang-migrate/migrate/v4/source/iofs"
+        _ "github.com/lib/pq"
+
+        "github.com/chris-ramon/golang-scaffolding/config"
+        "github.com/chris-ramon/golang-scaffolding/db/models"
+)
+
+//go:embed migrations/*.sql
+var fs embed.FS
+
+type db struct {
+        sqlDB   *sql.DB
+        queries *models.Queries
+}
+
+func (d *db) Ping(ctx context.Context) error <span class="cov0" title="0">{
+        if err := d.sqlDB.PingContext(ctx); err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+
+        <span class="cov0" title="0">return nil</span>
+}
+
+func (d *db) Close() error <span class="cov0" title="0">{
+        return d.sqlDB.Close()
+}</span>
+
+func (d *db) Migrate() error <span class="cov0" title="0">{
+        migrations, err := iofs.New(fs, "migrations")
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov0" title="0">driver, err := postgres.WithInstance(d.sqlDB, &amp;postgres.Config{})
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov0" title="0">m, err := migrate.NewWithInstance("iofs", migrations, "postgres", driver)
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov0" title="0">if err := m.Up(); err != migrate.ErrNoChange </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov0" title="0">return nil</span>
+}
+
+func (db *db) Queries() *models.Queries <span class="cov0" title="0">{
+        return db.queries
+}</span>
+
+func New(dbConfig *config.DBConfig) (*db, error) <span class="cov0" title="0">{
+        connStr := fmt.Sprintf("user=%s password=%s host=%s dbname=%s sslmode=%s",
+                dbConfig.User, dbConfig.PWD, dbConfig.Host, dbConfig.Name, dbConfig.SSLMode)
+
+        _db, err := sql.Open("postgres", connStr)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">queries := models.New(_db)
+
+        return &amp;db{
+                sqlDB:   _db,
+                queries: queries,
+        }, nil</span>
+}
+
+type DB interface {
+        Ping(ctx context.Context) error
+        Close() error
+        Migrate() error
+        Queries() *models.Queries
+}
+</pre>
+		
+		<pre class="file" id="file2" style="display: none">// Code generated by sqlc. DO NOT EDIT.
+// versions:
+//   sqlc v1.13.0
+
+package models
+
+import (
+        "context"
+        "database/sql"
+)
+
+type DBTX interface {
+        ExecContext(context.Context, string, ...interface{}) (sql.Result, error)
+        PrepareContext(context.Context, string) (*sql.Stmt, error)
+        QueryContext(context.Context, string, ...interface{}) (*sql.Rows, error)
+        QueryRowContext(context.Context, string, ...interface{}) *sql.Row
+}
+
+func New(db DBTX) *Queries <span class="cov0" title="0">{
+        return &amp;Queries{db: db}
+}</span>
+
+type Queries struct {
+        db DBTX
+}
+
+func (q *Queries) WithTx(tx *sql.Tx) *Queries <span class="cov0" title="0">{
+        return &amp;Queries{
+                db: tx,
+        }
+}</span>
+</pre>
+		
+		<pre class="file" id="file3" style="display: none">// Code generated by sqlc. DO NOT EDIT.
+// versions:
+//   sqlc v1.13.0
+// source: query.sql
+
+package models
+
+import (
+        "context"
+)
+
+const listUsers = `-- name: ListUsers :many
+SELECT id, uuid, username, first_name, last_name, created_at, updated_at
+FROM users
+ORDER BY created_at DESC
+LIMIT $1 OFFSET $2
+`
+
+type ListUsersParams struct {
+        Limit  int32
+        Offset int32
+}
+
+func (q *Queries) ListUsers(ctx context.Context, arg ListUsersParams) ([]User, error) <span class="cov0" title="0">{
+        rows, err := q.db.QueryContext(ctx, listUsers, arg.Limit, arg.Offset)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov0" title="0">defer rows.Close()
+        var items []User
+        for rows.Next() </span><span class="cov0" title="0">{
+                var i User
+                if err := rows.Scan(
+                        &amp;i.ID,
+                        &amp;i.Uuid,
+                        &amp;i.Username,
+                        &amp;i.FirstName,
+                        &amp;i.LastName,
+                        &amp;i.CreatedAt,
+                        &amp;i.UpdatedAt,
+                ); err != nil </span><span class="cov0" title="0">{
+                        return nil, err
+                }</span>
+                <span class="cov0" title="0">items = append(items, i)</span>
+        }
+        <span class="cov0" title="0">if err := rows.Close(); err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov0" title="0">if err := rows.Err(); err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov0" title="0">return items, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file4" style="display: none">package dashboard
+
+import (
+        "github.com/admin-golang/admin"
+        "github.com/admin-golang/admin/icon"
+)
+
+func NewPage() admin.Pager <span class="cov0" title="0">{
+        return admin.NewPage(admin.PageConfig{
+                ID:   "Dashboard",
+                URL:  "/dashboard",
+                Type: admin.DashboardPage,
+                Icon: icon.Icon{
+                        Type: icon.Dashboard,
+                },
+                ToolbarEnabled: true,
+        })
+}</span>
+</pre>
+		
+		<pre class="file" id="file5" style="display: none">package admin
+
+import (
+        "net/http"
+
+        "github.com/admin-golang/admin"
+
+        "github.com/chris-ramon/golang-scaffolding/domain/admin/dashboard"
+        "github.com/chris-ramon/golang-scaffolding/domain/admin/layout"
+        "github.com/chris-ramon/golang-scaffolding/domain/admin/signin"
+        "github.com/chris-ramon/golang-scaffolding/domain/admin/user"
+)
+
+type handlers struct {
+        adminHandler http.Handler
+}
+
+func (h *handlers) GetAdmin() http.Handler <span class="cov0" title="0">{
+        return h.adminHandler
+}</span>
+
+func NewHandlers() (*handlers, error) <span class="cov0" title="0">{
+        signInFormPage, err := signin.NewFormPage()
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">pages := admin.Pages{
+                signInFormPage,
+                dashboard.NewPage(),
+                user.NewList(),
+        }
+
+        adminHandler := admin.New(&amp;admin.Config{
+                DebugMode: false,
+                UITheme:   admin.MaterialUI,
+                Pages:     pages,
+                Layout:    layout.NewLayout(),
+        })
+
+        return &amp;handlers{adminHandler: adminHandler}, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file6" style="display: none">package layout
+
+import (
+        "github.com/admin-golang/admin/event"
+        "github.com/admin-golang/admin/icon"
+        "github.com/admin-golang/admin/layout"
+        "github.com/admin-golang/admin/menu"
+        "github.com/admin-golang/admin/state"
+)
+
+func NewLayout() *layout.Layout <span class="cov0" title="0">{
+        return layout.New(&amp;layout.Config{
+                Menu: &amp;menu.Menu{
+                        Items: menu.Items{
+                                menu.Item{
+                                        ID: "Notifications",
+                                        Badge: &amp;menu.Badge{
+                                                Content: 1,
+                                        },
+                                        Icon: icon.Icon{
+                                                Type: icon.Notifications,
+                                        },
+                                },
+                                menu.Item{
+                                        ID: "Account",
+                                        Icon: icon.Icon{
+                                                Type: icon.AccountCircle,
+                                        },
+                                        Popover: &amp;menu.Popover{
+                                                Items: menu.PopoverItems{
+                                                        menu.PopoverItem{
+                                                                Label: "My Account",
+                                                                Icon: &amp;icon.PopoverIcon{
+                                                                        Type: icon.Avatar,
+                                                                },
+                                                        },
+                                                        menu.PopoverItem{
+                                                                Label: "Logout",
+                                                                Icon: &amp;icon.PopoverIcon{
+                                                                        Type: icon.Logout,
+                                                                },
+                                                                OnClick: &amp;event.OnClick{
+                                                                        Actions: state.Actions{
+                                                                                state.NewActionRedirect("/sign-in"),
+                                                                                state.NewActionClearAppState(),
+                                                                        },
+                                                                },
+                                                        },
+                                                },
+                                        },
+                                },
+                        },
+                },
+                Title:       "Admin Title",
+                FooterLabel: "Copyright © Your Website 2022.",
+                Theme: &amp;layout.Theme{
+                        Palette: layout.Palette{
+                                Primary: layout.PaletteColor{
+                                        Main: "#00acc1",
+                                },
+                                Secondary: layout.PaletteColor{
+                                        Main: "#b2ebf2",
+                                },
+                        },
+                },
+        })
+}</span>
+</pre>
+		
+		<pre class="file" id="file7" style="display: none">package admin
+
+import (
+        "net/http"
+
+        "github.com/chris-ramon/golang-scaffolding/pkg/ctxutil"
+        "github.com/chris-ramon/golang-scaffolding/pkg/route"
+)
+
+type Handlers interface {
+        GetAdmin() http.Handler
+}
+
+type routes struct {
+        handlers Handlers
+}
+
+func (ro *routes) All() []route.Route <span class="cov0" title="0">{
+        return []route.Route{
+                route.Route{
+                        HTTPMethod: "GET",
+                        Path:       "/admin",
+                        Handler: func(w http.ResponseWriter, r *http.Request) </span><span class="cov0" title="0">{
+                                r = r.WithContext(ctxutil.WithAuthHeader(r.Context(), r.Header))
+                                ro.handlers.GetAdmin().ServeHTTP(w, r)
+                        }</span>,
+                },
+        }
+}
+
+func NewRoutes(handlers Handlers) *routes <span class="cov0" title="0">{
+        return &amp;routes{handlers: handlers}
+}</span>
+</pre>
+		
+		<pre class="file" id="file8" style="display: none">package signin
+
+import (
+        "net/url"
+
+        "github.com/admin-golang/admin"
+        "github.com/admin-golang/admin/icon"
+)
+
+func NewFormPage() (admin.Pager, error) <span class="cov0" title="0">{
+        sideFormBackgroundImage, err := url.Parse("https://source.unsplash.com/random/?golang")
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">return admin.NewSideFormPage(admin.SideFormPageConfig{
+                BackgroundImage: sideFormBackgroundImage,
+                FooterLabel:     "Copyright © Your Website 2023.",
+                PageConfig: admin.PageConfig{
+                        Icon: icon.Icon{
+                                Type: icon.Lock,
+                        },
+                        IsDefault: true,
+                        ID:        "SignIn",
+                        URL:       "/sign-in",
+                        Type:      admin.SideFormPage,
+                },
+                Form: admin.Form{
+                        ID:    "signIn",
+                        Title: "Sign in",
+                        Fields: admin.Fields{
+                                admin.Field{
+                                        ID:         "email",
+                                        Type:       admin.InputText,
+                                        Label:      "Email",
+                                        IsRequired: true,
+                                        Value:      "",
+                                        FullWidth:  true,
+                                },
+                                admin.Field{
+                                        ID:         "password",
+                                        Type:       admin.InputPassword,
+                                        Label:      "Password",
+                                        IsRequired: true,
+                                        Value:      "",
+                                        FullWidth:  true,
+                                },
+                        },
+                        Submit: admin.Submit{
+                                Label:  "Sign In",
+                                URL:    "/auth/sign-in",
+                                Method: "POST",
+                                OnSuccess: &amp;admin.OnSubmitSuccess{
+                                        SetAppState:          true,
+                                        SetAppStateFieldName: "currentUser",
+                                        RedirectURL: &amp;admin.RedirectURL{
+                                                URL: "/dashboard",
+                                        },
+                                },
+                        },
+                },
+        }), nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file9" style="display: none">package user
+
+import (
+        "net/http"
+
+        "github.com/admin-golang/admin"
+        "github.com/admin-golang/admin/dataloader"
+        "github.com/admin-golang/admin/icon"
+        "github.com/admin-golang/admin/navigation"
+)
+
+func NewList() admin.Pager <span class="cov0" title="0">{
+        return admin.NewListPage(admin.ListPageConfig{
+                PageConfig: admin.PageConfig{
+                        ID:   "Users",
+                        URL:  "/users",
+                        Type: admin.ListPage,
+                        Icon: icon.Icon{
+                                Type: icon.Inventory,
+                        },
+                        ToolbarEnabled: true,
+                },
+                Title: "Users",
+                MainButton: &amp;admin.MainButton{
+                        Label: "Add User",
+                        URL:   "/users/create",
+                },
+                DataLoader: dataloader.New(dataloader.Config{
+                        URL:    "/users",
+                        Method: http.MethodGet,
+                        SearchParams: &amp;navigation.SearchParams{
+                                navigation.SearchParam{
+                                        Key: "limit",
+                                        Value: navigation.SearchParamValue{
+                                                FromQueryParams: true,
+                                                SearchParamKey:  "limit",
+                                        },
+                                },
+                                navigation.SearchParam{
+                                        Key: "page",
+                                        Value: navigation.SearchParamValue{
+                                                FromQueryParams: true,
+                                                SearchParamKey:  "page",
+                                        },
+                                },
+                                navigation.SearchParam{
+                                        Key: "searchTerm",
+                                        Value: navigation.SearchParamValue{
+                                                FromQueryParams: true,
+                                                SearchParamKey:  "searchTerm",
+                                        },
+                                },
+                        },
+                        HeaderConfig: &amp;dataloader.HeaderConfig{
+                                Key: "Authorization",
+                                ValueConfig: dataloader.HeaderValueConfig{
+                                        Prefix:            "Bearer ",
+                                        AppStateFieldPath: "currentUser.jwt",
+                                },
+                        },
+                }),
+                Pagination: &amp;admin.PaginationConfig{
+                        RowsPerPage: 25,
+                },
+                ListRowConfig: &amp;admin.ListRowConfig{
+                        DataRowFieldName: "id",
+                        ParamKey:         ":id",
+                        OnClick: &amp;admin.OnListRowClick{
+                                RedirectURL: "/users/:id",
+                        },
+                },
+                SearchConfig: &amp;admin.ListSearchConfig{
+                        InputID:          "search",
+                        InputPlaceholder: "Search...",
+                },
+        })
+}</span>
+</pre>
+		
+		<pre class="file" id="file10" style="display: none">package auth
+
+import (
+        "context"
+        "encoding/json"
+        "io/ioutil"
+        "log"
+        "net/http"
+
+        "github.com/chris-ramon/golang-scaffolding/domain/auth/types"
+        "github.com/chris-ramon/golang-scaffolding/pkg/ctxutil"
+)
+
+type Service interface {
+        CurrentUser(ctx context.Context, jwtToken string) (*types.CurrentUser, error)
+        AuthUser(ctx context.Context, username string, pwd string) (*types.CurrentUser, error)
+}
+
+type handlers struct {
+        service Service
+}
+
+func (h *handlers) GetPing() http.HandlerFunc <span class="cov8" title="1">{
+        return func(w http.ResponseWriter, r *http.Request) </span><span class="cov8" title="1">{
+                w.Write([]byte("ok"))
+        }</span>
+}
+
+func (h *handlers) GetCurrentUser() http.HandlerFunc <span class="cov8" title="1">{
+        return func(w http.ResponseWriter, r *http.Request) </span><span class="cov8" title="1">{
+                r = r.WithContext(ctxutil.WithAuthHeader(r.Context(), r.Header))
+                jwtToken, err := ctxutil.AuthHeaderValueFromCtx(r.Context())
+                if err != nil </span><span class="cov8" title="1">{
+                        log.Printf("failed to get authorization header: %v", err)
+                        http.Error(w, "failed to get authorization header", http.StatusInternalServerError)
+                        return
+                }</span>
+
+                <span class="cov8" title="1">u, err := h.service.CurrentUser(r.Context(), jwtToken)
+                if err != nil </span><span class="cov8" title="1">{
+                        log.Printf("failed to find current user: %v", err)
+                        http.Error(w, "failed to find current user", http.StatusInternalServerError)
+                        return
+                }</span>
+
+                <span class="cov8" title="1">w.Write([]byte(u.Username))</span>
+        }
+}
+
+func (h *handlers) PostSignIn() http.HandlerFunc <span class="cov8" title="1">{
+        return func(w http.ResponseWriter, r *http.Request) </span><span class="cov8" title="1">{
+                b, err := ioutil.ReadAll(r.Body)
+                if err != nil </span><span class="cov8" title="1">{
+                        log.Printf("failed to read request body: %v", err)
+                        http.Error(w, "failed to read request body", http.StatusInternalServerError)
+                        return
+                }</span>
+
+                <span class="cov8" title="1">var reqBodyJSON struct {
+                        Email    string `json:"email"`
+                        Password string `json:"password"`
+                }
+
+                if err := json.Unmarshal(b, &amp;reqBodyJSON); err != nil </span><span class="cov8" title="1">{
+                        log.Printf("failed to json unmarshal request body: %v", err)
+                        http.Error(w, "failed to json unmarshal request body", http.StatusInternalServerError)
+                        return
+                }</span>
+
+                <span class="cov8" title="1">u, err := h.service.AuthUser(r.Context(), reqBodyJSON.Email, reqBodyJSON.Password)
+                if err != nil </span><span class="cov8" title="1">{
+                        log.Printf("failed to find current user: %v", err)
+                        http.Error(w, "failed to find current user", http.StatusInternalServerError)
+                        return
+                }</span>
+
+                <span class="cov8" title="1">w.Write([]byte(u.Username))</span>
+
+        }
+}
+
+func NewHandlers(service Service) *handlers <span class="cov8" title="1">{
+        return &amp;handlers{service: service}
+}</span>
+</pre>
+		
+		<pre class="file" id="file11" style="display: none">package mappers
+
+import (
+        "github.com/chris-ramon/golang-scaffolding/domain/auth/api"
+        "github.com/chris-ramon/golang-scaffolding/domain/auth/types"
+)
+
+func CurrentUserFromTypeToAPI(currentUser *types.CurrentUser) api.CurrentUser <span class="cov0" title="0">{
+        return api.CurrentUser{
+                ID:       currentUser.ID,
+                Username: currentUser.Username,
+                JWT:      currentUser.JWT,
+        }
+}</span>
+</pre>
+		
+		<pre class="file" id="file12" style="display: none">package auth
+
+import (
+        "net/http"
+
+        "github.com/chris-ramon/golang-scaffolding/pkg/route"
+)
+
+type Handlers interface {
+        GetPing() http.HandlerFunc
+        GetCurrentUser() http.HandlerFunc
+        PostSignIn() http.HandlerFunc
+}
+
+type routes struct {
+        handlers Handlers
+}
+
+func (r *routes) All() []route.Route <span class="cov8" title="1">{
+        return []route.Route{
+                route.Route{
+                        HTTPMethod: "GET",
+                        Path:       "/auth/ping",
+                        Handler:    r.handlers.GetPing(),
+                },
+                route.Route{
+                        HTTPMethod: "GET",
+                        Path:       "/auth/current-user",
+                        Handler:    r.handlers.GetCurrentUser(),
+                },
+                route.Route{
+                        HTTPMethod: "POST",
+                        Path:       "/auth/sign-in",
+                        Handler:    r.handlers.PostSignIn(),
+                },
+        }
+}</span>
+
+func NewRoutes(handlers Handlers) *routes <span class="cov8" title="1">{
+        return &amp;routes{handlers: handlers}
+}</span>
+</pre>
+		
+		<pre class="file" id="file13" style="display: none">package auth
+
+import (
+        "context"
+
+        "github.com/chris-ramon/golang-scaffolding/domain/auth/types"
+)
+
+type service struct {
+        jwt JWT
+}
+
+func (s *service) CurrentUser(ctx context.Context, jwtToken string) (*types.CurrentUser, error) <span class="cov8" title="1">{
+        data, err := s.jwt.Validate(ctx, jwtToken)
+        if err != nil </span><span class="cov8" title="1">{
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">return &amp;types.CurrentUser{
+                Username: data["username"],
+        }, nil</span>
+}
+
+func (s *service) AuthUser(ctx context.Context, username string, pwd string) (*types.CurrentUser, error) <span class="cov8" title="1">{
+        data := map[string]string{
+                "username": username,
+        }
+
+        jwtToken, err := s.jwt.Generate(ctx, data)
+        if err != nil </span><span class="cov8" title="1">{
+                return nil, err
+        }</span>
+
+        <span class="cov8" title="1">return &amp;types.CurrentUser{
+                Username: username,
+                JWT:      *jwtToken,
+        }, nil</span>
+}
+
+func NewService(jwt JWT) (*service, error) <span class="cov8" title="1">{
+        return &amp;service{jwt: jwt}, nil
+}</span>
+
+type JWT interface {
+        Generate(ctx context.Context, data map[string]string) (*string, error)
+        Validate(ctx context.Context, jwtToken string) (map[string]string, error)
+}
+</pre>
+		
+		<pre class="file" id="file14" style="display: none">package fields
+
+import (
+        "github.com/graphql-go/graphql"
+
+        "github.com/chris-ramon/golang-scaffolding/domain/auth/mappers"
+        "github.com/chris-ramon/golang-scaffolding/domain/gql/types"
+        usersMappers "github.com/chris-ramon/golang-scaffolding/domain/users/mappers"
+        "github.com/chris-ramon/golang-scaffolding/pkg/ctxutil"
+)
+
+var PingField = &amp;graphql.Field{
+        Name: "Ping",
+        Type: graphql.String,
+        Resolve: func(p graphql.ResolveParams) (interface{}, error) <span class="cov0" title="0">{
+                return "ok", nil
+        }</span>,
+}
+
+var CurrentUserField = &amp;graphql.Field{
+        Name: "CurrentUser",
+        Type: types.CurrentUserType,
+        Resolve: func(p graphql.ResolveParams) (interface{}, error) <span class="cov0" title="0">{
+                srvs, err := servicesFromResolveParams(p)
+                if err != nil </span><span class="cov0" title="0">{
+                        return nil, err
+                }</span>
+
+                <span class="cov0" title="0">jwtToken, err := ctxutil.AuthHeaderValueFromCtx(p.Context)
+                if err != nil </span><span class="cov0" title="0">{
+                        return nil, err
+                }</span>
+
+                <span class="cov0" title="0">currentUser, err := srvs.AuthService.CurrentUser(p.Context, jwtToken)
+                if err != nil </span><span class="cov0" title="0">{
+                        return nil, err
+                }</span>
+
+                <span class="cov0" title="0">currentUserAPI := mappers.CurrentUserFromTypeToAPI(currentUser)
+
+                return currentUserAPI, nil</span>
+        },
+}
+
+var AuthUserField = &amp;graphql.Field{
+        Type:        types.CurrentUserType,
+        Description: "Authenticates and authorizes an user.",
+        Args: graphql.FieldConfigArgument{
+                "username": &amp;graphql.ArgumentConfig{
+                        Type: graphql.NewNonNull(graphql.String),
+                },
+                "password": &amp;graphql.ArgumentConfig{
+                        Type: graphql.NewNonNull(graphql.String),
+                },
+        },
+        Resolve: func(p graphql.ResolveParams) (interface{}, error) <span class="cov0" title="0">{
+                srvs, err := servicesFromResolveParams(p)
+                if err != nil </span><span class="cov0" title="0">{
+                        return nil, err
+                }</span>
+
+                <span class="cov0" title="0">username, err := fieldFromArgs[string](p.Args, "username")
+                if err != nil </span><span class="cov0" title="0">{
+                        return nil, err
+                }</span>
+
+                <span class="cov0" title="0">password, err := fieldFromArgs[string](p.Args, "password")
+                if err != nil </span><span class="cov0" title="0">{
+                        return nil, err
+                }</span>
+
+                <span class="cov0" title="0">currentUser, err := srvs.AuthService.AuthUser(p.Context, username, password)
+                if err != nil </span><span class="cov0" title="0">{
+                        return nil, err
+                }</span>
+
+                <span class="cov0" title="0">return currentUser, nil</span>
+        },
+}
+
+var UsersField = &amp;graphql.Field{
+        Name: "Users",
+        Type: graphql.NewList(types.UserType),
+        Resolve: func(p graphql.ResolveParams) (interface{}, error) <span class="cov0" title="0">{
+                srvs, err := servicesFromResolveParams(p)
+                if err != nil </span><span class="cov0" title="0">{
+                        return nil, err
+                }</span>
+
+                <span class="cov0" title="0">users, err := srvs.UserService.FindUsers(p.Context)
+                if err != nil </span><span class="cov0" title="0">{
+                        return nil, err
+                }</span>
+
+                <span class="cov0" title="0">usersAPI := usersMappers.UsersFromTypeToAPI(users)
+
+                return usersAPI, nil</span>
+        },
+}
+</pre>
+		
+		<pre class="file" id="file15" style="display: none">package fields
+
+import (
+        "errors"
+
+        "github.com/graphql-go/graphql"
+
+        "github.com/chris-ramon/golang-scaffolding/domain/internal/services"
+)
+
+func servicesFromResolveParams(p graphql.ResolveParams) (*services.Services, error) <span class="cov0" title="0">{
+        rootValue := p.Info.RootValue.(map[string]interface{})
+        srvs, ok := rootValue["services"].(*services.Services)
+
+        if !ok </span><span class="cov0" title="0">{
+                return nil, errors.New("invalid services type")
+        }</span>
+
+        <span class="cov0" title="0">return srvs, nil</span>
+}
+
+func fieldFromArgs[T any](args map[string]interface{}, fieldName string) (T, error) <span class="cov0" title="0">{
+        field, ok := args[fieldName].(T)
+
+        if !ok </span><span class="cov0" title="0">{
+                return *new(T), errors.New("invalid type")
+        }</span>
+
+        <span class="cov0" title="0">return field, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file16" style="display: none">package gql
+
+import (
+        "context"
+        "net/http"
+
+        "github.com/graphql-go/handler"
+
+        "github.com/chris-ramon/golang-scaffolding/domain/gql/schema"
+        "github.com/chris-ramon/golang-scaffolding/domain/internal/services"
+)
+
+type handlers struct {
+        gqlHandler *handler.Handler
+}
+
+func (h *handlers) PostGraphQL() *handler.Handler <span class="cov0" title="0">{
+        return h.gqlHandler
+}</span>
+
+func (h *handlers) GetGraphQL() *handler.Handler <span class="cov0" title="0">{
+        return h.gqlHandler
+}</span>
+
+func NewHandlers(authService services.AuthService, userService services.UserService) (*handlers, error) <span class="cov0" title="0">{
+        appSchema, err := schema.New()
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">rootObjectFn := func(ctx context.Context, r *http.Request) map[string]interface{} </span><span class="cov0" title="0">{
+                rootObject := map[string]interface{}{
+                        "services": &amp;services.Services{
+                                AuthService: authService,
+                                UserService: userService,
+                        },
+                }
+                return rootObject
+        }</span>
+
+        <span class="cov0" title="0">h := handler.New(&amp;handler.Config{
+                Schema:       &amp;appSchema,
+                Pretty:       true,
+                Playground:   true,
+                RootObjectFn: rootObjectFn,
+        })
+
+        return &amp;handlers{
+                gqlHandler: h,
+        }, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file17" style="display: none">package gql
+
+import (
+        "net/http"
+
+        "github.com/graphql-go/handler"
+
+        "github.com/chris-ramon/golang-scaffolding/pkg/ctxutil"
+        "github.com/chris-ramon/golang-scaffolding/pkg/route"
+)
+
+type Handlers interface {
+        PostGraphQL() *handler.Handler
+        GetGraphQL() *handler.Handler
+}
+
+type routes struct {
+        handlers Handlers
+}
+
+func (ro *routes) All() []route.Route <span class="cov0" title="0">{
+        return []route.Route{
+                route.Route{
+                        HTTPMethod: "GET",
+                        Path:       "/graphql",
+                        Handler: func(w http.ResponseWriter, r *http.Request) </span><span class="cov0" title="0">{
+                                r = r.WithContext(ctxutil.WithAuthHeader(r.Context(), r.Header))
+                                ro.handlers.GetGraphQL().ServeHTTP(w, r)
+                        }</span>,
+                },
+                route.Route{
+                        HTTPMethod: "POST",
+                        Path:       "/graphql",
+                        Handler: func(w http.ResponseWriter, r *http.Request) <span class="cov0" title="0">{
+                                r = r.WithContext(ctxutil.WithAuthHeader(r.Context(), r.Header))
+                                ro.handlers.PostGraphQL().ServeHTTP(w, r)
+                        }</span>,
+                },
+        }
+}
+
+func NewRoutes(handlers Handlers) *routes <span class="cov0" title="0">{
+        return &amp;routes{handlers: handlers}
+}</span>
+</pre>
+		
+		<pre class="file" id="file18" style="display: none">package schema
+
+import (
+        "github.com/graphql-go/graphql"
+
+        "github.com/chris-ramon/golang-scaffolding/domain/gql/operations"
+)
+
+func New() (graphql.Schema, error) <span class="cov0" title="0">{
+        return graphql.NewSchema(graphql.SchemaConfig{
+                Query:    operations.Query,
+                Mutation: operations.Mutation,
+        })
+}</span>
+</pre>
+		
+		<pre class="file" id="file19" style="display: none">package users
+
+import (
+        "context"
+        "encoding/json"
+        "net/http"
+
+        "github.com/admin-golang/admin/dataloader"
+        "github.com/chris-ramon/golang-scaffolding/domain/users/mappers"
+        userTypes "github.com/chris-ramon/golang-scaffolding/domain/users/types"
+)
+
+type handlers struct {
+        srv Service
+}
+
+func (h *handlers) GetUsers() http.HandlerFunc <span class="cov0" title="0">{
+        return func(w http.ResponseWriter, r *http.Request) </span><span class="cov0" title="0">{
+                users, err := h.srv.FindUsers(r.Context())
+
+                if err != nil </span><span class="cov0" title="0">{
+                        http.Error(w, "failed to find users", http.StatusInternalServerError)
+                        return
+                }</span>
+
+                <span class="cov0" title="0">usersAPI := mappers.UsersFromTypeToAPI(users)
+
+                response := dataloader.Response{
+                        Data: usersAPI,
+                        Meta: dataloader.Meta{
+                                Headers: []string{"ID", "Username"},
+                                Components: map[string]string{
+                                        "id":       "text",
+                                        "username": "text",
+                                },
+                                Pagination: dataloader.Pagination{
+                                        TotalCount:  len(usersAPI),
+                                        PerPage:     10,
+                                        CurrentPage: 0,
+                                        RowsPerPage: []int{10, 25, 50},
+                                },
+                        },
+                }
+
+                resp, err := json.Marshal(response)
+                if err != nil </span><span class="cov0" title="0">{
+                        http.Error(w, "failed to marshal response", http.StatusInternalServerError)
+                        return
+                }</span>
+
+                <span class="cov0" title="0">w.Write(resp)</span>
+        }
+}
+
+func NewHandlers(usersService Service) (*handlers, error) <span class="cov0" title="0">{
+        return &amp;handlers{srv: usersService}, nil
+}</span>
+
+type Service interface {
+        FindUsers(ctx context.Context) ([]*userTypes.User, error)
+}
+</pre>
+		
+		<pre class="file" id="file20" style="display: none">package mappers
+
+import (
+        "github.com/chris-ramon/golang-scaffolding/domain/users/api"
+        "github.com/chris-ramon/golang-scaffolding/domain/users/types"
+)
+
+func UsersFromTypeToAPI(users []*types.User) []api.User <span class="cov0" title="0">{
+        apiUsers := []api.User{}
+
+        for _, user := range users </span><span class="cov0" title="0">{
+                apiUsers = append(apiUsers, api.User{
+                        ID:       user.ID,
+                        Username: user.Username,
+                })
+        }</span>
+
+        <span class="cov0" title="0">return apiUsers</span>
+}
+</pre>
+		
+		<pre class="file" id="file21" style="display: none">package users
+
+import (
+        "context"
+        "fmt"
+
+        "github.com/chris-ramon/golang-scaffolding/db"
+        "github.com/chris-ramon/golang-scaffolding/db/models"
+        userTypes "github.com/chris-ramon/golang-scaffolding/domain/users/types"
+)
+
+type repo struct {
+        db db.DB
+}
+
+func (r *repo) FindUsers(ctx context.Context) ([]*userTypes.User, error) <span class="cov0" title="0">{
+        args := models.ListUsersParams{
+                Limit:  10,
+                Offset: 0,
+        }
+
+        users, err := r.db.Queries().ListUsers(ctx, args)
+
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">var result []*userTypes.User
+
+        for _, user := range users </span><span class="cov0" title="0">{
+                result = append(result, &amp;userTypes.User{
+                        ID:       fmt.Sprintf("%d", user.ID),
+                        Username: user.Username,
+                })
+        }</span>
+
+        <span class="cov0" title="0">return result, nil</span>
+}
+
+func NewRepo(db db.DB) *repo <span class="cov0" title="0">{
+        return &amp;repo{db: db}
+}</span>
+</pre>
+		
+		<pre class="file" id="file22" style="display: none">package users
+
+import (
+        "net/http"
+
+        "github.com/chris-ramon/golang-scaffolding/pkg/route"
+)
+
+type Handlers interface {
+        GetUsers() http.HandlerFunc
+}
+
+type routes struct {
+        handlers Handlers
+}
+
+func (r *routes) All() []route.Route <span class="cov0" title="0">{
+        return []route.Route{
+                route.Route{
+                        HTTPMethod: "GET",
+                        Path:       "/users",
+                        Handler:    r.handlers.GetUsers(),
+                },
+        }
+}</span>
+
+func NewRoutes(handlers Handlers) *routes <span class="cov0" title="0">{
+        return &amp;routes{handlers: handlers}
+}</span>
+</pre>
+		
+		<pre class="file" id="file23" style="display: none">package users
+
+import (
+        "context"
+
+        userTypes "github.com/chris-ramon/golang-scaffolding/domain/users/types"
+)
+
+type service struct {
+        repo Repo
+}
+
+func (s *service) FindUsers(ctx context.Context) ([]*userTypes.User, error) <span class="cov0" title="0">{
+        return s.repo.FindUsers(ctx)
+}</span>
+
+func NewService(repo Repo) *service <span class="cov0" title="0">{
+        return &amp;service{repo: repo}
+}</span>
+
+type Repo interface {
+        FindUsers(ctx context.Context) ([]*userTypes.User, error)
+}
+</pre>
+		
+		<pre class="file" id="file24" style="display: none">package main
+
+import (
+        "fmt"
+        "log"
+        "net/http"
+        "slices"
+
+        "github.com/chris-ramon/golang-scaffolding/config"
+        "github.com/chris-ramon/golang-scaffolding/db"
+        "github.com/chris-ramon/golang-scaffolding/domain/admin"
+        "github.com/chris-ramon/golang-scaffolding/domain/auth"
+        "github.com/chris-ramon/golang-scaffolding/domain/gql"
+        "github.com/chris-ramon/golang-scaffolding/domain/users"
+        "github.com/chris-ramon/golang-scaffolding/pkg/jwt"
+)
+
+func main() <span class="cov0" title="0">{
+        handleErr := func(err error) </span><span class="cov0" title="0">{
+                log.Fatal(err)
+        }</span>
+
+        <span class="cov0" title="0">conf := config.New()
+        dbConf := config.NewDBConfig()
+
+        db, err := db.New(dbConf)
+        if err != nil </span><span class="cov0" title="0">{
+                handleErr(err)
+        }</span>
+
+        <span class="cov0" title="0">if err := db.Migrate(); err != nil </span><span class="cov0" title="0">{
+                handleErr(err)
+        }</span> else<span class="cov0" title="0"> {
+                log.Println("successfully run migrations")
+        }</span>
+
+        <span class="cov0" title="0">router := http.NewServeMux()
+
+        usersRepo := users.NewRepo(db)
+        usersService := users.NewService(usersRepo)
+        usersHandlers, err := users.NewHandlers(usersService)
+        if err != nil </span><span class="cov0" title="0">{
+                handleErr(err)
+        }</span>
+        <span class="cov0" title="0">usersRoutes := users.NewRoutes(usersHandlers)
+
+        jwt, err := jwt.NewJWT()
+        if err != nil </span><span class="cov0" title="0">{
+                handleErr(err)
+        }</span>
+
+        <span class="cov0" title="0">authService, err := auth.NewService(jwt)
+        if err != nil </span><span class="cov0" title="0">{
+                handleErr(err)
+        }</span>
+        <span class="cov0" title="0">authHandlers := auth.NewHandlers(authService)
+        authRoutes := auth.NewRoutes(authHandlers)
+
+        gqlHandlers, err := gql.NewHandlers(authService, usersService)
+        if err != nil </span><span class="cov0" title="0">{
+                handleErr(err)
+        }</span>
+
+        <span class="cov0" title="0">gqlRoutes := gql.NewRoutes(gqlHandlers)
+
+        adminHandlers, err := admin.NewHandlers()
+        if err != nil </span><span class="cov0" title="0">{
+                handleErr(err)
+        }</span>
+        <span class="cov0" title="0">adminRoutes := admin.NewRoutes(adminHandlers)
+
+        routes := slices.Concat(
+                authRoutes.All(),
+                gqlRoutes.All(),
+                adminRoutes.All(),
+                usersRoutes.All(),
+        )
+
+        for _, r := range routes </span><span class="cov0" title="0">{
+                router.HandleFunc(fmt.Sprintf("%s %s", r.HTTPMethod, r.Path), r.Handler)
+        }</span>
+
+        <span class="cov0" title="0">log.Printf("server running on port :%s", conf.Port)
+        log.Println(http.ListenAndServe(fmt.Sprintf(":%s", conf.Port), router))</span>
+}
+</pre>
+		
+		<pre class="file" id="file25" style="display: none">package ctxutil
+
+import (
+        "context"
+        "errors"
+        "net/http"
+        "strings"
+)
+
+const AuthHeaderName = "Authorization"
+
+func WithAuthHeader(ctx context.Context, header http.Header) context.Context <span class="cov8" title="1">{
+        return context.WithValue(ctx, AuthHeaderName, header.Get(AuthHeaderName))
+}</span>
+
+func AuthHeaderValueFromCtx(ctx context.Context) (string, error) <span class="cov8" title="1">{
+        authorizationWithBearer := strings.Split(ctx.Value(AuthHeaderName).(string), " ")
+        if len(authorizationWithBearer) != 2 </span><span class="cov8" title="1">{
+                return "", errors.New("invalid authorization header value")
+        }</span>
+        <span class="cov8" title="1">return authorizationWithBearer[1], nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file26" style="display: none">package jwt
+
+import (
+        "context"
+        "crypto/rsa"
+        _ "embed"
+        "time"
+
+        jwtV5 "github.com/golang-jwt/jwt/v5"
+)
+
+//go:embed app.rsa
+var appRsa []byte // openssl genrsa -out app.rsa 2048
+
+//go:embed app.rsa.pub
+var appRsaPub []byte // openssl rsa -in app.rsa -pubout &gt; app.rsa.pub
+
+type customClaims struct {
+        Data map[string]string `json:"data"`
+        jwtV5.RegisteredClaims
+}
+
+type jwt struct {
+        defaultExpireTimeInHours time.Duration
+        signKey                  *rsa.PrivateKey
+        verifyKey                *rsa.PublicKey
+}
+
+func (j *jwt) Generate(ctx context.Context, data map[string]string) (*string, error) <span class="cov0" title="0">{
+        expiresAt := jwtV5.NewNumericDate(time.Now().Add(j.defaultExpireTimeInHours * time.Hour))
+
+        t := jwtV5.New(jwtV5.GetSigningMethod("RS256"))
+        t.Claims = customClaims{
+                data,
+                jwtV5.RegisteredClaims{
+                        ExpiresAt: expiresAt,
+                },
+        }
+
+        jwtToken, err := t.SignedString(j.signKey)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">return &amp;jwtToken, nil</span>
+}
+
+func (j *jwt) Validate(ctx context.Context, jwtToken string) (map[string]string, error) <span class="cov0" title="0">{
+        parsedJWTToken, err := jwtV5.ParseWithClaims(jwtToken, &amp;customClaims{}, func(t *jwtV5.Token) (interface{}, error) </span><span class="cov0" title="0">{
+                return j.verifyKey, nil
+        }</span>)
+        <span class="cov0" title="0">if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">claims := parsedJWTToken.Claims.(*customClaims)
+
+        return claims.Data, nil</span>
+}
+
+func NewJWT() (*jwt, error) <span class="cov0" title="0">{
+        signBytes := appRsa
+
+        sKey, err := jwtV5.ParseRSAPrivateKeyFromPEM(signBytes)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">verifyBytes := appRsaPub
+
+        vKey, err := jwtV5.ParseRSAPublicKeyFromPEM(verifyBytes)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">return &amp;jwt{
+                defaultExpireTimeInHours: 24,
+                signKey:                  sKey,
+                verifyKey:                vKey,
+        }, nil</span>
+}
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>
