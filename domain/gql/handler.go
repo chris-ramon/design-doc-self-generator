@@ -22,7 +22,7 @@ func (h *handlers) GetGraphQL() *handler.Handler {
 	return h.gqlHandler
 }
 
-func NewHandlers(authService services.AuthService, userService services.UserService) (*handlers, error) {
+func NewHandlers(authService services.AuthService, userService services.UserService, solutionService services.SolutionService) (*handlers, error) {
 	appSchema, err := schema.New()
 	if err != nil {
 		return nil, err
@@ -31,8 +31,9 @@ func NewHandlers(authService services.AuthService, userService services.UserServ
 	rootObjectFn := func(ctx context.Context, r *http.Request) map[string]interface{} {
 		rootObject := map[string]interface{}{
 			"services": &services.Services{
-				AuthService: authService,
-				UserService: userService,
+				AuthService:     authService,
+				UserService:     userService,
+				SolutionService: solutionService,
 			},
 		}
 		return rootObject
