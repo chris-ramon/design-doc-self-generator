@@ -12,6 +12,7 @@ var Query = graphql.NewObject(graphql.ObjectConfig{
 		"ping":        fields.PingField,
 		"currentUser": fields.CurrentUserField,
 		"users":       fields.UsersField,
+		"solutions":   fields.SolutionsField,
 	},
 })
 

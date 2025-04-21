@@ -97,3 +97,11 @@ var UsersField = &graphql.Field{
 		return usersAPI, nil
 	},
 }
+
+var SolutionsField = &graphql.Field{
+	Name: "Solutions",
+	Type: graphql.NewList(types.SolutionType),
+	Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+		return nil, nil
+	},
+}

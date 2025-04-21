@@ -35,3 +35,77 @@ var UserType = graphql.NewObject(graphql.ObjectConfig{
 		},
 	},
 })
+
+var SolutionType = graphql.NewObject(graphql.ObjectConfig{
+	Name: "SolutionType",
+	Fields: graphql.Fields{
+		"analysis": &graphql.Field{
+			Description: "The analysis list of the solution.",
+			Type:        graphql.NewList(AnalysisType),
+		},
+	},
+})
+
+var AnalysisType = graphql.NewObject(graphql.ObjectConfig{
+	Name: "AnalysisType",
+	Fields: graphql.Fields{
+		"information": &graphql.Field{
+			Description: "The analysis list of the solution.",
+			Type:        graphql.NewList(InformationType),
+		},
+	},
+})
+
+var InformationType = graphql.NewObject(graphql.ObjectConfig{
+	Name: "InformationType",
+	Fields: graphql.Fields{
+		"github": &graphql.Field{
+			Description: "The GitHub information.",
+			Type:        GitHubType,
+		},
+	},
+})
+
+var GitHubType = graphql.NewObject(graphql.ObjectConfig{
+	Name: "GitHubType",
+	Fields: graphql.Fields{
+		"metrics": &graphql.Field{
+			Description: "The GitHub metrics.",
+			Type:        MetricsType,
+		},
+	},
+})
+
+var MetricsType = graphql.NewObject(graphql.ObjectConfig{
+	Name: "MetricsType",
+	Fields: graphql.Fields{
+		"pullRequests": &graphql.Field{
+			Description: "The metrics of pull requests.",
+			Type:        graphql.NewList(PullRequestType),
+		},
+	},
+})
+
+var PullRequestType = graphql.NewObject(graphql.ObjectConfig{
+	Name: "PullRequestType",
+	Fields: graphql.Fields{
+		"duration": &graphql.Field{
+			Description: "The duration of the pull request.",
+			Type:        graphql.Int,
+		},
+		"contributors": &graphql.Field{
+			Description: "The contributors of the pull request.",
+			Type:        graphql.NewList(ContributorType),
+		},
+	},
+})
+
+var ContributorType = graphql.NewObject(graphql.ObjectConfig{
+	Name: "ContributorType",
+	Fields: graphql.Fields{
+		"profileUrl": &graphql.Field{
+			Description: "The profile url of a contributor.",
+			Type:        graphql.String,
+		},
+	},
+})
