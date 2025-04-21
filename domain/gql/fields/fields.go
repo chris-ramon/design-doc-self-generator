@@ -5,6 +5,7 @@ import (
 
 	"github.com/chris-ramon/golang-scaffolding/domain/auth/mappers"
 	"github.com/chris-ramon/golang-scaffolding/domain/gql/types"
+	solutionsMappers "github.com/chris-ramon/golang-scaffolding/domain/solutions/mappers"
 	usersMappers "github.com/chris-ramon/golang-scaffolding/domain/users/mappers"
 	"github.com/chris-ramon/golang-scaffolding/pkg/ctxutil"
 )
@@ -102,6 +103,18 @@ var SolutionsField = &graphql.Field{
 	Name: "Solutions",
 	Type: graphql.NewList(types.SolutionType),
 	Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-		return nil, nil
+		srvs, err := servicesFromResolveParams(p)
+		if err != nil {
+			return nil, err
+		}
+
+		solutions, err := srvs.SolutionService.FindAnalysis(p.Context)
+		if err != nil {
+			return nil, err
+		}
+
+		solutionsAPI := solutionsMappers.SolutionsFromTypeToAPI(solutions)
+
+		return solutionsAPI, nil
 	},
 }
