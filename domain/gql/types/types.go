@@ -80,7 +80,7 @@ var MetricsType = graphql.NewObject(graphql.ObjectConfig{
 	Name: "MetricsType",
 	Fields: graphql.Fields{
 		"pullRequests": &graphql.Field{
-			Description: "The metrics of pull requests.",
+			Description: "The list of pull requests.",
 			Type:        graphql.NewList(PullRequestType),
 		},
 	},
