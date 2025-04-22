@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 	authTypes "github.com/chris-ramon/golang-scaffolding/domain/auth/types"
+	solutionTypes "github.com/chris-ramon/golang-scaffolding/domain/solutions/types"
 	userTypes "github.com/chris-ramon/golang-scaffolding/domain/users/types"
 )
 
@@ -15,7 +16,12 @@ type UserService interface {
 	FindUsers(ctx context.Context) ([]*userTypes.User, error)
 }
 
+type SolutionService interface {
+	FindAnalysis(ctx context.Context) ([]*solutionTypes.Solution, error)
+}
+
 type Services struct {
-	AuthService AuthService
-	UserService UserService
+	AuthService     AuthService
+	UserService     UserService
+	SolutionService SolutionService
 }
