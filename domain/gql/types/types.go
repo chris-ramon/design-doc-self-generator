@@ -50,7 +50,7 @@ var AnalysisType = graphql.NewObject(graphql.ObjectConfig{
 	Name: "AnalysisType",
 	Fields: graphql.Fields{
 		"information": &graphql.Field{
-			Description: "The analysis list of the solution.",
+			Description: "The information list of the solution.",
 			Type:        graphql.NewList(InformationType),
 		},
 	},
