@@ -17,7 +17,7 @@ type UserService interface {
 }
 
 type SolutionService interface {
-	FindAnalysis(ctx context.Context) ([]*solutionTypes.Solution, error)
+	FindAnalysis(ctx context.Context) (solutionTypes.SolutionSet, error)
 }
 
 type Services struct {
