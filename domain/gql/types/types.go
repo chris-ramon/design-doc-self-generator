@@ -1,7 +1,11 @@
 package types
 
 import (
+	"log"
+
 	"github.com/graphql-go/graphql"
+
+	"github.com/chris-ramon/golang-scaffolding/domain/gql/util"
 )
 
 var CurrentUserType = graphql.NewObject(graphql.ObjectConfig{
@@ -82,6 +86,22 @@ var MetricsType = graphql.NewObject(graphql.ObjectConfig{
 		"pullRequests": &graphql.Field{
 			Description: "The list of pull requests.",
 			Type:        graphql.NewList(PullRequestType),
+			Args: graphql.FieldConfigArgument{
+				"ids": &graphql.ArgumentConfig{
+					// Type: graphql.NewList(graphql.Int),
+					Type: graphql.Int,
+				},
+			},
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				ids, err := util.FieldFromArgs[int](p.Args, "ids")
+				if err != nil {
+					return nil, err
+				}
+
+				log.Printf("ids: %+v", ids)
+
+				return nil, nil
+			},
 		},
 	},
 })
