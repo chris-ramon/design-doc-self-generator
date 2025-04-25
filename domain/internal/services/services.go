@@ -20,8 +20,13 @@ type SolutionService interface {
 	FindAnalysis(ctx context.Context) (solutionTypes.SolutionSet, error)
 }
 
+type MetricsService interface {
+	FindPullRequests(ctx context.Context, ids []int) (string, error)
+}
+
 type Services struct {
 	AuthService     AuthService
 	UserService     UserService
 	SolutionService SolutionService
+	MetricsService  MetricsService
 }
