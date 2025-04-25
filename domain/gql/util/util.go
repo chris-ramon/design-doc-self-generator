@@ -2,6 +2,7 @@ package util
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/graphql-go/graphql"
 
@@ -28,4 +29,14 @@ func FieldFromArgs[T any](args map[string]any, fieldName string) (T, error) {
 	}
 
 	return field, nil
+}
+
+// FieldFromArgs returns the fields from the given arguments by field name.
+func FieldsFromArgs(args map[string]any, fieldName string) (any, error) {
+	fields, ok := args[fieldName]
+	if !ok {
+		return nil, fmt.Errorf("field name: %v, not found", fieldName)
+	}
+
+	return fields, nil
 }
