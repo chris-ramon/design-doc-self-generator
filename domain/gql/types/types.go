@@ -1,9 +1,8 @@
 package types
 
 import (
-	"errors"
-
 	"github.com/graphql-go/graphql"
+	"log"
 
 	"github.com/chris-ramon/golang-scaffolding/domain/gql/util"
 )
@@ -92,7 +91,7 @@ var MetricsType = graphql.NewObject(graphql.ObjectConfig{
 				},
 			},
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-				ids, err := util.FieldsFromArgs(p.Args, "ids")
+				ids, err := util.FieldsFromArgs[int](p.Args, "ids")
 				if err != nil {
 					return nil, err
 				}
@@ -102,24 +101,12 @@ var MetricsType = graphql.NewObject(graphql.ObjectConfig{
 					return nil, err
 				}
 
-				pullRequestIds, ok := ids.([]interface{})
-				if !ok {
-					return nil, errors.New("failed to infer pull request ids type")
-				}
-
-				prIds := []int{}
-				for _, id := range pullRequestIds {
-					pullRequestId, ok := id.(int)
-					if !ok {
-						return nil, errors.New("failed to infer pull request id type")
-					}
-					prIds = append(prIds, pullRequestId)
-				}
-
-				pullRequests, err := srvs.MetricsService.FindPullRequests(p.Context, prIds)
+				pullRequests, err := srvs.MetricsService.FindPullRequests(p.Context, ids)
 				if err != nil {
 					return nil, err
 				}
+
+				log.Println(pullRequests)
 
 				return []string{pullRequests}, nil
 			},
