@@ -19,7 +19,8 @@ func ServicesFromResolveParams(p graphql.ResolveParams) (*services.Services, err
 	return srvs, nil
 }
 
-func FieldFromArgs[T any](args map[string]interface{}, fieldName string) (T, error) {
+// FieldFromArgs returns the primitive field from the given arguments by the field name.
+func FieldFromArgs[T any](args map[string]any, fieldName string) (T, error) {
 	field, ok := args[fieldName].(T)
 
 	if !ok {
