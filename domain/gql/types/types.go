@@ -1,9 +1,8 @@
 package types
 
 import (
-	"log"
-
 	"github.com/graphql-go/graphql"
+	"log"
 
 	"github.com/chris-ramon/golang-scaffolding/domain/gql/util"
 )
@@ -88,19 +87,28 @@ var MetricsType = graphql.NewObject(graphql.ObjectConfig{
 			Type:        graphql.NewList(PullRequestType),
 			Args: graphql.FieldConfigArgument{
 				"ids": &graphql.ArgumentConfig{
-					// Type: graphql.NewList(graphql.Int),
-					Type: graphql.Int,
+					Type: graphql.NewList(graphql.Int),
 				},
 			},
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-				ids, err := util.FieldFromArgs[int](p.Args, "ids")
+				ids, err := util.FieldsFromArgs[int](p.Args, "ids")
 				if err != nil {
 					return nil, err
 				}
 
-				log.Printf("ids: %+v", ids)
+				srvs, err := util.ServicesFromResolveParams(p)
+				if err != nil {
+					return nil, err
+				}
 
-				return nil, nil
+				pullRequests, err := srvs.MetricsService.FindPullRequests(p.Context, ids)
+				if err != nil {
+					return nil, err
+				}
+
+				log.Println(pullRequests)
+
+				return []string{pullRequests}, nil
 			},
 		},
 	},

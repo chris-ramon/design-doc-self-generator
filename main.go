@@ -11,6 +11,7 @@ import (
 	"github.com/chris-ramon/golang-scaffolding/domain/admin"
 	"github.com/chris-ramon/golang-scaffolding/domain/auth"
 	"github.com/chris-ramon/golang-scaffolding/domain/gql"
+	"github.com/chris-ramon/golang-scaffolding/domain/metrics"
 	"github.com/chris-ramon/golang-scaffolding/domain/solutions"
 	"github.com/chris-ramon/golang-scaffolding/domain/users"
 	"github.com/chris-ramon/golang-scaffolding/pkg/jwt"
@@ -62,7 +63,12 @@ func main() {
 		handleErr(err)
 	}
 
-	gqlHandlers, err := gql.NewHandlers(authService, usersService, solutionService)
+	metricsService, err := metrics.NewService()
+	if err != nil {
+		handleErr(err)
+	}
+
+	gqlHandlers, err := gql.NewHandlers(authService, usersService, solutionService, metricsService)
 	if err != nil {
 		handleErr(err)
 	}
