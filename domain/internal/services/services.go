@@ -21,7 +21,7 @@ type SolutionService interface {
 }
 
 type MetricsService interface {
-	FindPullRequests(ctx context.Context, ids []int) (string, error)
+	FindPullRequests(ctx context.Context) (string, error)
 }
 
 type Services struct {
