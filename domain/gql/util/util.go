@@ -32,11 +32,26 @@ func FieldFromArgs[T any](args map[string]any, fieldName string) (T, error) {
 }
 
 // FieldFromArgs returns the fields from the given arguments by field name.
-func FieldsFromArgs(args map[string]any, fieldName string) (any, error) {
+func FieldsFromArgs[T any](args map[string]any, fieldName string) ([]T, error) {
 	fields, ok := args[fieldName]
 	if !ok {
 		return nil, fmt.Errorf("field name: %v, not found", fieldName)
 	}
 
-	return fields, nil
+	values, ok := fields.([]interface{})
+	if !ok {
+		return nil, errors.New("failed to infer fields type")
+	}
+
+	var result []T
+	for _, v := range values {
+		value, ok := v.(T)
+		if !ok {
+			return nil, errors.New("failed to infer field type")
+		}
+
+		result = append(result, value)
+	}
+
+	return result, nil
 }
