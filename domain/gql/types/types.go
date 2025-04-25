@@ -1,7 +1,7 @@
 package types
 
 import (
-	"log"
+	"errors"
 
 	"github.com/graphql-go/graphql"
 
@@ -97,9 +97,31 @@ var MetricsType = graphql.NewObject(graphql.ObjectConfig{
 					return nil, err
 				}
 
-				log.Printf("ids: %+v", ids)
+				srvs, err := util.ServicesFromResolveParams(p)
+				if err != nil {
+					return nil, err
+				}
 
-				return nil, nil
+				pullRequestIds, ok := ids.([]interface{})
+				if !ok {
+					return nil, errors.New("failed to infer pull request ids type")
+				}
+
+				prIds := []int{}
+				for _, id := range pullRequestIds {
+					pullRequestId, ok := id.(int)
+					if !ok {
+						return nil, errors.New("failed to infer pull request id type")
+					}
+					prIds = append(prIds, pullRequestId)
+				}
+
+				pullRequests, err := srvs.MetricsService.FindPullRequests(p.Context, prIds)
+				if err != nil {
+					return nil, err
+				}
+
+				return []string{pullRequests}, nil
 			},
 		},
 	},
