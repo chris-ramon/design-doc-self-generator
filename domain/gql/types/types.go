@@ -88,12 +88,11 @@ var MetricsType = graphql.NewObject(graphql.ObjectConfig{
 			Type:        graphql.NewList(PullRequestType),
 			Args: graphql.FieldConfigArgument{
 				"ids": &graphql.ArgumentConfig{
-					// Type: graphql.NewList(graphql.Int),
-					Type: graphql.Int,
+					Type: graphql.NewList(graphql.Int),
 				},
 			},
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-				ids, err := util.FieldFromArgs[int](p.Args, "ids")
+				ids, err := util.FieldsFromArgs(p.Args, "ids")
 				if err != nil {
 					return nil, err
 				}
