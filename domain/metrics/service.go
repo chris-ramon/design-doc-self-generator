@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/chris-ramon/golang-scaffolding/domain/metrics/types"
 	"github.com/google/go-github/github"
 )
 
@@ -22,24 +23,22 @@ type FindPullRequestsParams struct {
 }
 
 type FindPullRequestsResult struct {
-	PullRequest *PullRequest
+	PullRequest *types.PullRequest
 }
 
-func (s *service) FindPullRequests(ctx context.Context) (string, error) {
-	p := FindPullRequestsParams{}
-
+func (s *service) FindPullRequests(ctx context.Context, params FindPullRequestsParams) (string, error) {
 	// Create a GitHub client using the provided HTTP client.
-	client := github.NewClient(p.HTTPClient)
+	client := github.NewClient(params.HTTPClient)
 
 	// Fetch pull request information from GitHub.
-	pullRequest, _, err := client.PullRequests.Get(ctx, p.Owner, p.Repo, p.Number)
+	pullRequest, _, err := client.PullRequests.Get(ctx, params.Owner, params.Repo, params.Number)
 	if err != nil {
 		return "", err
 	}
 
 	// Extract pull request metrics.
 	duration := pullRequest.CreatedAt.Sub(*pullRequest.MergedAt)
-	pr := &PullRequest{
+	pr := &types.PullRequest{
 		Duration: duration,
 	}
 
