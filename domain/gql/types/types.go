@@ -5,7 +5,7 @@ import (
 	"log"
 
 	"github.com/chris-ramon/golang-scaffolding/domain/gql/util"
-	// metricsTypes "github.com/chris-ramon/golang-scaffolding/domain/metrics/types"
+	metrics "github.com/chris-ramon/golang-scaffolding/domain/metrics"
 )
 
 var CurrentUserType = graphql.NewObject(graphql.ObjectConfig{
@@ -103,10 +103,10 @@ var MetricsType = graphql.NewObject(graphql.ObjectConfig{
 				}
 
 				log.Println(ids)
-				// params := metricsTypes.FindPullRequestsParams{
-				//   IDs: ids,
-				// }
-				pullRequests, err := srvs.MetricsService.FindPullRequests(p.Context)
+				params := metrics.FindPullRequestsParams{
+					IDs: ids,
+				}
+				pullRequests, err := srvs.MetricsService.FindPullRequests(p.Context, params)
 				if err != nil {
 					return nil, err
 				}
