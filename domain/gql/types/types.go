@@ -87,12 +87,12 @@ var MetricsType = graphql.NewObject(graphql.ObjectConfig{
 			Description: "The list of pull requests.",
 			Type:        graphql.NewList(PullRequestType),
 			Args: graphql.FieldConfigArgument{
-				"ids": &graphql.ArgumentConfig{
-					Type: graphql.NewList(graphql.Int),
+				"urls": &graphql.ArgumentConfig{
+					Type: graphql.NewList(graphql.String),
 				},
 			},
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-				ids, err := util.FieldsFromArgs[int](p.Args, "ids")
+				urls, err := util.FieldsFromArgs[string](p.Args, "urls")
 				if err != nil {
 					return nil, err
 				}
@@ -102,9 +102,11 @@ var MetricsType = graphql.NewObject(graphql.ObjectConfig{
 					return nil, err
 				}
 
-				log.Println(ids)
 				params := metrics.FindPullRequestsParams{
-					IDs: ids,
+					URLs:   urls,
+					Owner:  "",
+					Repo:   "",
+					Number: 1,
 				}
 				pullRequests, err := srvs.MetricsService.FindPullRequests(p.Context, params)
 				if err != nil {
