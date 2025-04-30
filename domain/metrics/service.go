@@ -10,14 +10,6 @@ import (
 )
 
 type service struct {
-}
-
-type FindPullRequestsParams struct {
-	IDs    []int
-	Owner  string
-	Repo   string
-	Number int
-
 	// HTTPClient is the HTTP client used for GitHub API requests.
 	HTTPClient *http.Client
 }
@@ -26,12 +18,20 @@ type FindPullRequestsResult struct {
 	PullRequest *types.PullRequest
 }
 
-func (s *service) FindPullRequests(ctx context.Context, params FindPullRequestsParams) (string, error) {
+func (s *service) FindPullRequests(ctx context.Context, params types.FindPullRequestsParams) (string, error) {
+	for _, pr := range params {
+		s.findPullRequests(ctx, pr)
+	}
+
+	return "ok", nil
+}
+
+func (s *service) findPullRequests(ctx context.Context, param types.FindPullRequestParam) (string, error) {
 	// Create a GitHub client using the provided HTTP client.
-	client := github.NewClient(params.HTTPClient)
+	client := github.NewClient(s.HTTPClient)
 
 	// Fetch pull request information from GitHub.
-	pullRequest, _, err := client.PullRequests.Get(ctx, params.Owner, params.Repo, params.Number)
+	pullRequest, _, err := client.PullRequests.Get(ctx, param.Owner, param.Repo, param.Number)
 	if err != nil {
 		return "", err
 	}
@@ -50,8 +50,9 @@ func (s *service) FindPullRequests(ctx context.Context, params FindPullRequestsP
 	log.Printf("result: %+v", result)
 
 	return "ok", nil
+
 }
 
-func NewService() (*service, error) {
-	return &service{}, nil
+func NewService(HTTPClient *http.Client) (*service, error) {
+	return &service{HTTPClient: HTTPClient}, nil
 }
