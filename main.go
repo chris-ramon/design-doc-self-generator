@@ -63,7 +63,8 @@ func main() {
 		handleErr(err)
 	}
 
-	metricsService, err := metrics.NewService()
+	HTTPClient := &http.Client{}
+	metricsService, err := metrics.NewService(HTTPClient)
 	if err != nil {
 		handleErr(err)
 	}
