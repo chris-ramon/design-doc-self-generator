@@ -5,7 +5,8 @@ import (
 	"log"
 
 	"github.com/chris-ramon/golang-scaffolding/domain/gql/util"
-	metrics "github.com/chris-ramon/golang-scaffolding/domain/metrics"
+	"github.com/chris-ramon/golang-scaffolding/domain/metrics/github"
+	"github.com/chris-ramon/golang-scaffolding/domain/metrics/mappers"
 )
 
 var CurrentUserType = graphql.NewObject(graphql.ObjectConfig{
@@ -102,12 +103,12 @@ var MetricsType = graphql.NewObject(graphql.ObjectConfig{
 					return nil, err
 				}
 
-				params := metrics.FindPullRequestsParams{
-					URLs:   urls,
-					Owner:  "",
-					Repo:   "",
-					Number: 1,
+				prs, err := github.PullRequestsFromURLs(urls)
+				if err != nil {
+					return nil, err
 				}
+				params := mappers.PullRequestsFromTypeToFindParam(prs)
+
 				pullRequests, err := srvs.MetricsService.FindPullRequests(p.Context, params)
 				if err != nil {
 					return nil, err
