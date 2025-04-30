@@ -113,7 +113,9 @@ var MetricsType = graphql.NewObject(graphql.ObjectConfig{
 					return nil, err
 				}
 
-				return findPullRequestsResult.PullRequests, nil
+				pullRequests := mappers.PullRequestsFromTypeToAPI(findPullRequestsResult.PullRequests)
+
+				return pullRequests, nil
 			},
 		},
 	},
