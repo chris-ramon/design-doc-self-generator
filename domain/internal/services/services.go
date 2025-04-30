@@ -3,7 +3,7 @@ package services
 import (
 	"context"
 	authTypes "github.com/chris-ramon/golang-scaffolding/domain/auth/types"
-	metrics "github.com/chris-ramon/golang-scaffolding/domain/metrics"
+	metricTypes "github.com/chris-ramon/golang-scaffolding/domain/metrics/types"
 	solutionTypes "github.com/chris-ramon/golang-scaffolding/domain/solutions/types"
 	userTypes "github.com/chris-ramon/golang-scaffolding/domain/users/types"
 )
@@ -22,7 +22,7 @@ type SolutionService interface {
 }
 
 type MetricsService interface {
-	FindPullRequests(ctx context.Context, params metrics.FindPullRequestsParams) (string, error)
+	FindPullRequests(ctx context.Context, params metricTypes.FindPullRequestsParams) (string, error)
 }
 
 type Services struct {
