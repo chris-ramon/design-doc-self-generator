@@ -16,6 +16,8 @@ require (
 
 require (
 	github.com/evanw/esbuild v0.12.17 // indirect
+	github.com/google/go-github v17.0.0+incompatible // indirect
+	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	go.uber.org/atomic v1.7.0 // indirect

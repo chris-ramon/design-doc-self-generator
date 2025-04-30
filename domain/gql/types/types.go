@@ -2,9 +2,10 @@ package types
 
 import (
 	"github.com/graphql-go/graphql"
-	"log"
 
 	"github.com/chris-ramon/golang-scaffolding/domain/gql/util"
+	"github.com/chris-ramon/golang-scaffolding/domain/metrics/github"
+	"github.com/chris-ramon/golang-scaffolding/domain/metrics/mappers"
 )
 
 var CurrentUserType = graphql.NewObject(graphql.ObjectConfig{
@@ -86,12 +87,12 @@ var MetricsType = graphql.NewObject(graphql.ObjectConfig{
 			Description: "The list of pull requests.",
 			Type:        graphql.NewList(PullRequestType),
 			Args: graphql.FieldConfigArgument{
-				"ids": &graphql.ArgumentConfig{
-					Type: graphql.NewList(graphql.Int),
+				"urls": &graphql.ArgumentConfig{
+					Type: graphql.NewList(graphql.String),
 				},
 			},
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-				ids, err := util.FieldsFromArgs[int](p.Args, "ids")
+				urls, err := util.FieldsFromArgs[string](p.Args, "urls")
 				if err != nil {
 					return nil, err
 				}
@@ -101,14 +102,20 @@ var MetricsType = graphql.NewObject(graphql.ObjectConfig{
 					return nil, err
 				}
 
-				pullRequests, err := srvs.MetricsService.FindPullRequests(p.Context, ids)
+				prs, err := github.PullRequestsFromURLs(urls)
+				if err != nil {
+					return nil, err
+				}
+				params := mappers.PullRequestsFromTypeToFindParam(prs)
+
+				findPullRequestsResult, err := srvs.MetricsService.FindPullRequests(p.Context, params)
 				if err != nil {
 					return nil, err
 				}
 
-				log.Println(pullRequests)
+				pullRequests := mappers.PullRequestsFromTypeToAPI(findPullRequestsResult.PullRequests)
 
-				return []string{pullRequests}, nil
+				return pullRequests, nil
 			},
 		},
 	},
