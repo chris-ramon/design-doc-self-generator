@@ -2,7 +2,6 @@ package types
 
 import (
 	"github.com/graphql-go/graphql"
-	"log"
 
 	"github.com/chris-ramon/golang-scaffolding/domain/gql/util"
 	"github.com/chris-ramon/golang-scaffolding/domain/metrics/github"
@@ -109,14 +108,12 @@ var MetricsType = graphql.NewObject(graphql.ObjectConfig{
 				}
 				params := mappers.PullRequestsFromTypeToFindParam(prs)
 
-				pullRequests, err := srvs.MetricsService.FindPullRequests(p.Context, params)
+				findPullRequestsResult, err := srvs.MetricsService.FindPullRequests(p.Context, params)
 				if err != nil {
 					return nil, err
 				}
 
-				log.Println(pullRequests)
-
-				return []string{pullRequests}, nil
+				return findPullRequestsResult.PullRequests, nil
 			},
 		},
 	},
