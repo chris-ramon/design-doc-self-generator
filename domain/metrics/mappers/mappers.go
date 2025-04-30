@@ -1,6 +1,7 @@
 package mappers
 
 import (
+	"github.com/chris-ramon/golang-scaffolding/domain/metrics/api"
 	"github.com/chris-ramon/golang-scaffolding/domain/metrics/types"
 )
 
@@ -25,4 +26,23 @@ func PullRequestFromTypeToFindParam(pullRequest types.PullRequest) types.FindPul
 	}
 
 	return result
+}
+
+// PullRequestsFromTypeToAPI maps given pull requests internal types to pull requests API types.
+func PullRequestsFromTypeToAPI(pullRequests []*types.PullRequest) api.PullRequests {
+	result := api.PullRequests{}
+
+	for _, pullRequest := range pullRequests {
+		pr := PullRequestFromTypeToAPI(pullRequest)
+		result = append(result, pr)
+	}
+
+	return result
+}
+
+// PullRequestFromTypeToAPI maps given pull request internal type to pull request API type.
+func PullRequestFromTypeToAPI(pullRequest *types.PullRequest) api.PullRequest {
+	return api.PullRequest{
+		Duration: pullRequest.Duration.Hours() / 24,
+	}
 }
