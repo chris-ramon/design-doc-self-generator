@@ -49,7 +49,9 @@ func (s *service) findPullRequests(ctx context.Context, param types.FindPullRequ
 	// Extract pull request metrics.
 	duration := pullRequest.MergedAt.Sub(*pullRequest.CreatedAt)
 	pr := &types.PullRequest{
-		Duration: duration,
+		Duration:  duration,
+		CreatedAt: pullRequest.CreatedAt,
+		MergedAt:  pullRequest.MergedAt,
 	}
 
 	// Create the result.
