@@ -1,6 +1,9 @@
 package types
 
-import "time"
+import (
+	"fmt"
+	"time"
+)
 
 // PullRequest represents an internal pull request.
 type PullRequest struct {
@@ -15,6 +18,17 @@ type PullRequest struct {
 
 	// Repo is the repository name of the pull request.
 	Repo string
+
+	// CreatedAt is the pull request created at time.
+	CreatedAt *time.Time
+
+	// MergedAt is the pull request merged at time.
+	MergedAt *time.Time
+}
+
+// FormattedIntervalDates formats and returns the created at and merged at dates.
+func (pr PullRequest) FormattedIntervalDates() string {
+	return fmt.Sprintf("%s - %s", pr.CreatedAt.String(), pr.MergedAt.String())
 }
 
 // PullRequests are a slice of pull requests.
