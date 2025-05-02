@@ -124,13 +124,27 @@ var MetricsType = graphql.NewObject(graphql.ObjectConfig{
 var PullRequestType = graphql.NewObject(graphql.ObjectConfig{
 	Name: "PullRequestType",
 	Fields: graphql.Fields{
-		"durationInDays": &graphql.Field{
-			Description: "The duration of the pull request in days.",
-			Type:        graphql.Int,
+		"duration": &graphql.Field{
+			Description: "The duration of the pull request.",
+			Type:        DurationType,
 		},
 		"contributors": &graphql.Field{
 			Description: "The contributors of the pull request.",
 			Type:        graphql.NewList(ContributorType),
+		},
+	},
+})
+
+var DurationType = graphql.NewObject(graphql.ObjectConfig{
+	Name: "DurationType",
+	Fields: graphql.Fields{
+		"inDays": &graphql.Field{
+			Description: "The time duration in days.",
+			Type:        graphql.Int,
+		},
+		"formattedIntervalDates": &graphql.Field{
+			Description: "The time formatted interval dates.",
+			Type:        graphql.String,
 		},
 	},
 })
