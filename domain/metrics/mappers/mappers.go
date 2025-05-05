@@ -23,6 +23,7 @@ func PullRequestFromTypeToFindParam(pullRequest types.PullRequest) types.FindPul
 		Number: pullRequest.Number,
 		Owner:  pullRequest.Owner,
 		Repo:   pullRequest.Repo,
+		URL:    pullRequest.URL,
 	}
 
 	return result
@@ -43,6 +44,7 @@ func PullRequestsFromTypeToAPI(pullRequests []*types.PullRequest) api.PullReques
 // PullRequestFromTypeToAPI maps given pull request internal type to pull request API type.
 func PullRequestFromTypeToAPI(pullRequest *types.PullRequest) api.PullRequest {
 	return api.PullRequest{
+		URL: pullRequest.URL,
 		Duration: api.Duration{
 			InDays:                 pullRequest.Duration.Hours() / 24,
 			FormattedIntervalDates: pullRequest.FormattedIntervalDates(),
