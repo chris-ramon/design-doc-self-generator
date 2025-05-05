@@ -124,6 +124,10 @@ var MetricsType = graphql.NewObject(graphql.ObjectConfig{
 var PullRequestType = graphql.NewObject(graphql.ObjectConfig{
 	Name: "PullRequestType",
 	Fields: graphql.Fields{
+		"url": &graphql.Field{
+			Description: "The pull request url",
+			Type:        graphql.String,
+		},
 		"duration": &graphql.Field{
 			Description: "The duration of the pull request.",
 			Type:        DurationType,
