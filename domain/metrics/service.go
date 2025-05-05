@@ -2,6 +2,7 @@ package metrics
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 
 	"github.com/chris-ramon/golang-scaffolding/domain/metrics/types"
@@ -44,6 +45,14 @@ func (s *service) findPullRequests(ctx context.Context, param types.FindPullRequ
 	pullRequest, _, err := client.PullRequests.Get(ctx, param.Owner, param.Repo, param.Number)
 	if err != nil {
 		return nil, err
+	}
+
+	if pullRequest.MergedAt == nil {
+		return nil, fmt.Errorf("unexpected merged at nil value")
+	}
+
+	if pullRequest.CreatedAt == nil {
+		return nil, fmt.Errorf("unexpected created at nil value")
 	}
 
 	// Extract pull request metrics.
