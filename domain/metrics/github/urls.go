@@ -43,6 +43,7 @@ func PullRequestFromURL(url string) (*types.PullRequest, error) {
 		Owner:  owner,
 		Repo:   repo,
 		Number: number,
+		URL:    url,
 	}
 
 	return result, nil
