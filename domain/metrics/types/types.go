@@ -28,6 +28,10 @@ type PullRequest struct {
 
 // FormattedIntervalDates formats and returns the created at and merged at dates.
 func (pr PullRequest) FormattedIntervalDates() string {
+	if pr.CreatedAt == nil || pr.MergedAt == nil {
+		return ""
+	}
+
 	return fmt.Sprintf("%s - %s", pr.CreatedAt.String(), pr.MergedAt.String())
 }
 
