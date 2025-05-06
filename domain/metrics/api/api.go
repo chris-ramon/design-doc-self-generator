@@ -14,6 +14,9 @@ type PullRequest struct {
 
 	// MergedAt is the pull request merged at time.
 	MergedAt *time.Time
+
+	// URL is the pull request url.
+	URL string
 }
 
 // Duration represents a time duration.

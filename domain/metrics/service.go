@@ -61,6 +61,7 @@ func (s *service) findPullRequests(ctx context.Context, param types.FindPullRequ
 		Duration:  duration,
 		CreatedAt: pullRequest.CreatedAt,
 		MergedAt:  pullRequest.MergedAt,
+		URL:       param.URL,
 	}
 
 	// Create the result.

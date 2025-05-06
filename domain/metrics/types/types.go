@@ -24,6 +24,9 @@ type PullRequest struct {
 
 	// MergedAt is the pull request merged at time.
 	MergedAt *time.Time
+
+	// URL is the pull request url.
+	URL string
 }
 
 // FormattedIntervalDates formats and returns the created at and merged at dates.
@@ -48,6 +51,9 @@ type FindPullRequestParam struct {
 
 	// Repo is the repository name parameter.
 	Repo string
+
+	// URL is the pull request url.
+	URL string
 }
 
 // FindPullRequestsParams are a slice of find pull requests parameters.
