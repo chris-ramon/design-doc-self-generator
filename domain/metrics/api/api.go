@@ -20,6 +20,9 @@ type PullRequest struct {
 
 	// Contributors are the pull request's contributors.
 	Contributors Contributors
+
+	// FormattedContributors are the pull request's formatted contributors.
+	FormattedContributors string `json:"formattedContributors"`
 }
 
 // Contributor represents the pull request contributor.
