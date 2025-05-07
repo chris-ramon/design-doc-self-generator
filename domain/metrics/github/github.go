@@ -27,7 +27,7 @@ type PullRequestContributorsQuery struct {
 }
 
 type Repository struct {
-	PullRequest PullRequests `graphql:"pullRequests(headRefName: $pullRequestsHeadRefName, first: $pullRequestsFirst)"`
+	PullRequests PullRequests `graphql:"pullRequests(headRefName: $pullRequestsHeadRefName, first: $pullRequestsFirst)"`
 }
 
 type PullRequests struct {
@@ -38,10 +38,10 @@ type PullRequestsNodes []PullRequestsNode
 
 type PullRequestsNode struct {
 	State        githubv4.String
-	Participants Particpants `graphql:"participants(first: $participantsFirst)"`
+	Participants Participants `graphql:"participants(first: $participantsFirst)"`
 }
 
-type Particpants struct {
+type Participants struct {
 	Nodes ParticipantsNodes
 }
 
@@ -52,7 +52,7 @@ type ParticipantsNode struct {
 type ParticipantsNodes []ParticipantsNode
 
 // PullRequestContributors searches and returns the contributors of the given pull request.
-func (gh *GitHub) PullRequestContributors(params PullRequestContributorsParams) (any, error) {
+func (gh *GitHub) PullRequestContributors(params PullRequestContributorsParams) (PullRequestContributorsQuery, error) {
 	query := PullRequestContributorsQuery{}
 
 	variables := map[string]interface{}{
