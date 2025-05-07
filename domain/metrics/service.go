@@ -61,8 +61,20 @@ func (s *service) findPullRequests(ctx context.Context, param types.FindPullRequ
 		return nil, fmt.Errorf("unexpected created at nil value")
 	}
 
+	if pullRequest.Head == nil {
+		return nil, fmt.Errorf("unexpected head nil value")
+	}
+
+	if pullRequest.Head.Ref == nil {
+		return nil, fmt.Errorf("unexpected head ref nil value")
+	}
+
 	pullRequestContributorsParams := github.PullRequestContributorsParams{
-		PullRequest: types.PullRequest{},
+		PullRequest: types.PullRequest{
+			Owner:       param.Owner,
+			Repo:        param.Repo,
+			HeadRefName: *pullRequest.Head.Ref,
+		},
 	}
 	r, err := s.GitHub.PullRequestContributors(pullRequestContributorsParams)
 	if err != nil {
