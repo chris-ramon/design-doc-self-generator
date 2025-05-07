@@ -14,6 +14,10 @@ type GitHub struct {
 	Client *githubv4.Client
 }
 
+func (gh *GitHub) Query(query any) error {
+	return gh.Client.Query(context.Background(), &query, nil)
+}
+
 // NewGitHub returns a pointer to the GitHub struct.
 func NewGitHub() *GitHub {
 	github := &GitHub{}
