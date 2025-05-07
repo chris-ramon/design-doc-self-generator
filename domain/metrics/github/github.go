@@ -22,22 +22,38 @@ type PullRequestContributorsParams struct {
 	PullRequest types.PullRequest
 }
 
+type PullRequestContributorsQuery struct {
+	Repository Repository `graphql:"repository(owner: $repositoryOwner, name: $repositoryName)"`
+}
+
+type Repository struct {
+	PullRequest PullRequests `graphql:"pullRequests(headRefName: $pullRequestsHeadRefName, first: $pullRequestsFirst)"`
+}
+
+type PullRequests struct {
+	Nodes PullRequestsNodes
+}
+
+type PullRequestsNodes []PullRequestsNode
+
+type PullRequestsNode struct {
+	State        githubv4.String
+	Participants Particpants `graphql:"participants(first: $participantsFirst)"`
+}
+
+type Particpants struct {
+	Nodes ParticipantsNodes
+}
+
+type ParticipantsNode struct {
+	URL githubv4.String
+}
+
+type ParticipantsNodes []ParticipantsNode
+
 // PullRequestContributors searches and returns the contributors of the given pull request.
 func (gh *GitHub) PullRequestContributors(params PullRequestContributorsParams) (any, error) {
-	var query struct {
-		Repository struct {
-			PullRequests struct {
-				Nodes []struct {
-					State        githubv4.String
-					Participants struct {
-						Nodes []struct {
-							URL githubv4.String
-						}
-					} `graphql:"participants(first: $participantsFirst)"`
-				}
-			} `graphql:"pullRequests(headRefName: $pullRequestsHeadRefName, first: $pullRequestsFirst)"`
-		} `graphql:"repository(owner: $repositoryOwner, name: $repositoryName)"`
-	}
+	query := PullRequestContributorsQuery{}
 
 	variables := map[string]interface{}{
 		"repositoryOwner":         githubv4.String("graphql-go"),
