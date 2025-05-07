@@ -17,7 +17,19 @@ type PullRequest struct {
 
 	// URL is the pull request url.
 	URL string
+
+	// Contributors are the pull request's contributors.
+	Contributors Contributors
 }
+
+// Contributor represents the pull request contributor.
+type Contributor struct {
+	// ProfileURL is the contributor profile URL.
+	ProfileURL string
+}
+
+// Contributors represents slice of Contributors.
+type Contributors []Contributor
 
 // Duration represents a time duration.
 type Duration struct {
