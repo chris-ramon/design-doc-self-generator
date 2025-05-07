@@ -56,10 +56,10 @@ func (gh *GitHub) PullRequestContributors(params PullRequestContributorsParams) 
 	query := PullRequestContributorsQuery{}
 
 	variables := map[string]interface{}{
-		"repositoryOwner":         githubv4.String("graphql-go"),
-		"repositoryName":          githubv4.String("graphql"),
+		"repositoryOwner":         githubv4.String(params.PullRequest.Owner),
+		"repositoryName":          githubv4.String(params.PullRequest.Repo),
 		"participantsFirst":       githubv4.Int(100),
-		"pullRequestsHeadRefName": githubv4.String("sogko/0.4.18"),
+		"pullRequestsHeadRefName": githubv4.String(params.PullRequest.HeadRefName),
 		"pullRequestsFirst":       githubv4.Int(100),
 	}
 
