@@ -49,7 +49,8 @@ func PullRequestFromTypeToAPI(pullRequest *types.PullRequest) api.PullRequest {
 			InDays:                 pullRequest.Duration.Hours() / 24,
 			FormattedIntervalDates: pullRequest.FormattedIntervalDates(),
 		},
-		Contributors: ContributorsFromTypeToAPI(pullRequest.Contributors),
+		Contributors:          ContributorsFromTypeToAPI(pullRequest.Contributors),
+		FormattedContributors: pullRequest.FormattedContributors,
 	}
 }
 
