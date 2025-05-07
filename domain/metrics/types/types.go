@@ -30,6 +30,9 @@ type PullRequest struct {
 
 	// Contributors are the pull request's contributors.
 	Contributors Contributors
+
+	// HeadRefName is the pull request head reference name.
+	HeadRefName string
 }
 
 // Contributor represents the pull request contributor.
