@@ -3,6 +3,7 @@ package metrics
 import (
 	"context"
 	"fmt"
+	"log"
 	"net/http"
 
 	githubClient "github.com/google/go-github/github"
@@ -59,6 +60,15 @@ func (s *service) findPullRequests(ctx context.Context, param types.FindPullRequ
 	if pullRequest.CreatedAt == nil {
 		return nil, fmt.Errorf("unexpected created at nil value")
 	}
+
+	pullRequestContributorsParams := github.PullRequestContributorsParams{
+		PullRequest: types.PullRequest{},
+	}
+	r, err := s.GitHub.PullRequestContributors(pullRequestContributorsParams)
+	if err != nil {
+		return nil, err
+	}
+	log.Println(r)
 
 	contributors := types.Contributors{
 		types.Contributor{
