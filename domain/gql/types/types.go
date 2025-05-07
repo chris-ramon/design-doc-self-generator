@@ -136,6 +136,10 @@ var PullRequestType = graphql.NewObject(graphql.ObjectConfig{
 			Description: "The contributors of the pull request.",
 			Type:        graphql.NewList(ContributorType),
 		},
+		"formattedContributors": &graphql.Field{
+			Description: "The formatted contributors of the pull request.",
+			Type:        graphql.String,
+		},
 	},
 })
 
