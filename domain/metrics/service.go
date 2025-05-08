@@ -5,13 +5,18 @@ import (
 	"fmt"
 	"net/http"
 
+	githubClient "github.com/google/go-github/github"
+
+	"github.com/chris-ramon/golang-scaffolding/domain/metrics/github"
 	"github.com/chris-ramon/golang-scaffolding/domain/metrics/types"
-	"github.com/google/go-github/github"
 )
 
 type service struct {
 	// HTTPClient is the HTTP client used for GitHub API requests.
 	HTTPClient *http.Client
+
+	// GitHub is the github component.
+	GitHub *github.GitHub
 }
 
 type FindPullRequestsResult struct {
@@ -39,7 +44,7 @@ func (s *service) FindPullRequests(ctx context.Context, params types.FindPullReq
 
 func (s *service) findPullRequests(ctx context.Context, param types.FindPullRequestParam) (*findPullRequestsResult, error) {
 	// Create a GitHub client using the provided HTTP client.
-	client := github.NewClient(s.HTTPClient)
+	client := githubClient.NewClient(s.HTTPClient)
 
 	// Fetch pull request information from GitHub.
 	pullRequest, _, err := client.PullRequests.Get(ctx, param.Owner, param.Repo, param.Number)
@@ -55,13 +60,46 @@ func (s *service) findPullRequests(ctx context.Context, param types.FindPullRequ
 		return nil, fmt.Errorf("unexpected created at nil value")
 	}
 
+	if pullRequest.Head == nil {
+		return nil, fmt.Errorf("unexpected head nil value")
+	}
+
+	if pullRequest.Head.Ref == nil {
+		return nil, fmt.Errorf("unexpected head ref nil value")
+	}
+
+	pullRequestContributorsParams := github.PullRequestContributorsParams{
+		PullRequest: types.PullRequest{
+			Owner:       param.Owner,
+			Repo:        param.Repo,
+			HeadRefName: *pullRequest.Head.Ref,
+		},
+	}
+	r, err := s.GitHub.PullRequestContributors(pullRequestContributorsParams)
+	if err != nil {
+		return nil, err
+	}
+
+	contributors := types.Contributors{}
+
+	for _, prNode := range r.Repository.PullRequests.Nodes {
+		for _, participant := range prNode.Participants.Nodes {
+			c := types.Contributor{
+				ProfileURL: string(participant.URL),
+			}
+			contributors = append(contributors, c)
+		}
+	}
+
 	// Extract pull request metrics.
 	duration := pullRequest.MergedAt.Sub(*pullRequest.CreatedAt)
 	pr := &types.PullRequest{
-		Duration:  duration,
-		CreatedAt: pullRequest.CreatedAt,
-		MergedAt:  pullRequest.MergedAt,
-		URL:       param.URL,
+		Duration:              duration,
+		CreatedAt:             pullRequest.CreatedAt,
+		MergedAt:              pullRequest.MergedAt,
+		URL:                   param.URL,
+		Contributors:          contributors,
+		FormattedContributors: contributors.FormattedContributors(),
 	}
 
 	// Create the result.
@@ -73,5 +111,12 @@ func (s *service) findPullRequests(ctx context.Context, param types.FindPullRequ
 }
 
 func NewService(HTTPClient *http.Client) (*service, error) {
-	return &service{HTTPClient: HTTPClient}, nil
+	github := github.NewGitHub()
+
+	srv := &service{
+		HTTPClient: HTTPClient,
+		GitHub:     github,
+	}
+
+	return srv, nil
 }

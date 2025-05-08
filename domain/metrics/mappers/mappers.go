@@ -49,5 +49,25 @@ func PullRequestFromTypeToAPI(pullRequest *types.PullRequest) api.PullRequest {
 			InDays:                 pullRequest.Duration.Hours() / 24,
 			FormattedIntervalDates: pullRequest.FormattedIntervalDates(),
 		},
+		Contributors:          ContributorsFromTypeToAPI(pullRequest.Contributors),
+		FormattedContributors: pullRequest.FormattedContributors,
+	}
+}
+
+// ContributorsFromTypeToAPI maps given contributor internal type to contributor api type.
+func ContributorsFromTypeToAPI(contributors types.Contributors) api.Contributors {
+	result := api.Contributors{}
+
+	for _, c := range contributors {
+		result = append(result, ContributorFromTypeToAPI(c))
+	}
+
+	return result
+}
+
+// ContributorFromTypeToAPI maps given contributor internal type to contributor api type.
+func ContributorFromTypeToAPI(contributor types.Contributor) api.Contributor {
+	return api.Contributor{
+		ProfileURL: contributor.ProfileURL,
 	}
 }

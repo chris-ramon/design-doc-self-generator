@@ -2,6 +2,7 @@ package types
 
 import (
 	"fmt"
+	"strings"
 	"time"
 )
 
@@ -27,6 +28,35 @@ type PullRequest struct {
 
 	// URL is the pull request url.
 	URL string
+
+	// Contributors are the pull request's contributors.
+	Contributors Contributors
+
+	// HeadRefName is the pull request head reference name.
+	HeadRefName string
+
+	// FormattedContributors are the pull request's formatted contributors.
+	FormattedContributors string
+}
+
+// Contributor represents the pull request contributor.
+type Contributor struct {
+	// ProfileURL is the contributor profile URL.
+	ProfileURL string
+}
+
+// Contributors represents slice of Contributors.
+type Contributors []Contributor
+
+func (c *Contributors) FormattedContributors() string {
+	result := []string{}
+
+	for _, contributor := range *c {
+		formattedProfileURL := fmt.Sprintf("- %s", contributor.ProfileURL)
+		result = append(result, formattedProfileURL)
+	}
+
+	return strings.Join(result, "</br>")
 }
 
 // FormattedIntervalDates formats and returns the created at and merged at dates.

@@ -31,6 +31,9 @@ type PullRequests []PullRequest
 type PullRequest struct {
 	Duration     int          `json:"duration"`
 	Contributors Contributors `json:"contributors"`
+
+	// FormattedContributors are the pull request's formatted contributors.
+	FormattedContributors string `json:"formattedContributors"`
 }
 
 type Contributors []Contributor
