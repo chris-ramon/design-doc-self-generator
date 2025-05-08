@@ -52,10 +52,11 @@ func (c *Contributors) FormattedContributors() string {
 	result := []string{}
 
 	for _, contributor := range *c {
-		result = append(result, contributor.ProfileURL)
+		formattedProfileURL := fmt.Sprintf("- %s", contributor.ProfileURL)
+		result = append(result, formattedProfileURL)
 	}
 
-	return strings.Join(result, ", ")
+	return strings.Join(result, "</br>")
 }
 
 // FormattedIntervalDates formats and returns the created at and merged at dates.
