@@ -149,6 +149,8 @@ func (s *service) findPullRequests(ctx context.Context, param types.FindPullRequ
 		CreatedAt:             pullRequest.CreatedAt,
 		MergedAt:              pullRequest.MergedAt,
 		URL:                   param.URL,
+		Title:                 *pullRequest.Title,
+		Body:                  *pullRequest.Body,
 		Contributors:          contributors,
 		FormattedContributors: contributors.FormattedContributors(),
 	}

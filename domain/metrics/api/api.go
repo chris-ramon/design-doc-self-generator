@@ -19,10 +19,10 @@ type PullRequest struct {
 	URL string
 
 	// Title is the pull request title.
-	Title string
+	Title string `json:"title"`
 
 	// Body is the pull request body.
-	Body string
+	Body string `json:"body"`
 
 	// Contributors are the pull request's contributors.
 	Contributors Contributors
