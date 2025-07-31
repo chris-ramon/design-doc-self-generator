@@ -250,12 +250,12 @@ func (s *service) FindAllPullRequests(ctx context.Context, params FindAllPullReq
 }
 
 func NewService(cache *cachePkg.Cache, HTTPClient *http.Client) (*service, error) {
-	github := github.NewGitHub()
+	gh := github.NewGitHub()
 
 	srv := &service{
 		cache:      cache,
 		HTTPClient: HTTPClient,
-		GitHub:     github,
+		GitHub:     gh,
 	}
 
 	return srv, nil
