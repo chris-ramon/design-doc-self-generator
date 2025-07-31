@@ -20,6 +20,12 @@ type PullRequest struct {
 	// Repo is the repository name of the pull request.
 	Repo string
 
+	// Title is the pull request title.
+	Title string
+
+	// Body is the pull request body.
+	Body string
+
 	// CreatedAt is the pull request created at time.
 	CreatedAt *time.Time
 
