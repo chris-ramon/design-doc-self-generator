@@ -1,14 +1,8 @@
-# golang-scaffolding [![Tests](https://github.com/chris-ramon/golang-scaffolding/actions/workflows/tests.yml/badge.svg)](https://github.com/chris-ramon/golang-scaffolding/actions/workflows/tests.yml) [![codecov](https://codecov.io/gh/chris-ramon/golang-scaffolding/branch/main/graph/badge.svg?token=VUGFGVC37X)](https://codecov.io/gh/chris-ramon/golang-scaffolding)
+# Design Doc Self Generator
 
-A golang scaffolding for getting started new projects.
+Self-generates design doc.
 
 #### Getting Started
-
-##### Replace Paths
-
-```
-ag -l 'chris-ramon/golang-scaffolding'|xargs sed -i 's/<your-org>/<your-repo>/g'
-```
 
 ##### Running
 
@@ -23,7 +17,8 @@ docker compose up
 
 ##### Features
 
-Contains the following example domains:
+Contains the following features:
+- [x] Pulls GitHub Data.
 - [x] Env Variables.
 - [x] Config.
 - [x] Auth.
