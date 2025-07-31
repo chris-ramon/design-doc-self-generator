@@ -38,7 +38,8 @@ func main() {
 	}
 
 	cache := cachePkg.New()
-	log.Println(cache)
+	cache.Add("1", 1)
+	log.Println(cache.Get("1"))
 
 	usersRepo := users.NewRepo(db)
 	usersService := users.NewService(usersRepo)
