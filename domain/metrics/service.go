@@ -144,13 +144,22 @@ func (s *service) findPullRequests(ctx context.Context, param types.FindPullRequ
 
 	// Extract pull request metrics.
 	duration := pullRequest.MergedAt.Sub(*pullRequest.CreatedAt)
+	
+	var title, body string
+	if pullRequest.Title != nil {
+		title = *pullRequest.Title
+	}
+	if pullRequest.Body != nil {
+		body = *pullRequest.Body
+	}
+	
 	pr := &types.PullRequest{
 		Duration:              duration,
 		CreatedAt:             pullRequest.CreatedAt,
 		MergedAt:              pullRequest.MergedAt,
 		URL:                   param.URL,
-		Title:                 *pullRequest.Title,
-		Body:                  *pullRequest.Body,
+		Title:                 title,
+		Body:                  body,
 		Contributors:          contributors,
 		FormattedContributors: contributors.FormattedContributors(),
 	}
