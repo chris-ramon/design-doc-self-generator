@@ -1,0 +1,20 @@
+query {
+  solutions {
+    analysis {
+      information {
+        github {
+          metrics {
+            pullRequests(urls: ["https://github.com/graphql-go/graphql/pull/117"]) {
+              url
+              duration {
+                inDays
+                formattedIntervalDates
+              }
+              formattedContributors
+            }
+          }
+        }
+      }
+    }
+  }
+}
