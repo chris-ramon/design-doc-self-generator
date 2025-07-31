@@ -11,6 +11,7 @@ require (
 	github.com/admin-golang/admin v0.0.0-20220720064250-fa4d88cf3085
 	github.com/golang-jwt/jwt/v5 v5.0.0-rc.2
 	github.com/golang-migrate/migrate/v4 v4.15.2
+	github.com/golang/groupcache v0.0.0-20241129210726-2c02b8208cf8
 	github.com/google/go-github v17.0.0+incompatible
 	github.com/lib/pq v1.10.8
 	github.com/shurcooL/githubv4 v0.0.0-20240727222349-48295856cce7
@@ -19,7 +20,6 @@ require (
 
 require (
 	github.com/evanw/esbuild v0.12.17 // indirect
-	github.com/golang/groupcache v0.0.0-20241129210726-2c02b8208cf8 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect

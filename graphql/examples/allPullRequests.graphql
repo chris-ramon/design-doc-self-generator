@@ -1,0 +1,21 @@
+# Example query to get all pull requests from a GitHub repository
+query GetAllPullRequests {
+  solutions {
+    analysis {
+      information {
+        github(url: "https://github.com/graphql-go/graphql") {
+          metrics {
+            pullRequests {
+              url
+              duration {
+                inDays
+                formattedIntervalDates
+              }
+              formattedContributors
+            }
+          }
+        }
+      }
+    }
+  }
+}

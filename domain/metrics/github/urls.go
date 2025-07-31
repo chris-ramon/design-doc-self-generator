@@ -8,6 +8,19 @@ import (
 	"github.com/chris-ramon/golang-scaffolding/domain/metrics/types"
 )
 
+// RepositoryFromURL returns owner and repo from a GitHub repository URL.
+func RepositoryFromURL(url string) (owner, repo string, err error) {
+	parts := strings.Split(url, "/")
+	if len(parts) < 5 {
+		return "", "", errors.New("invalid repository URL format")
+	}
+
+	owner = parts[3]
+	repo = parts[4]
+
+	return owner, repo, nil
+}
+
 // PullRequestsFromURLs returns a slice of pull requests from given pull requests URLs.
 func PullRequestsFromURLs(urls []string) (types.PullRequests, error) {
 	result := types.PullRequests{}
