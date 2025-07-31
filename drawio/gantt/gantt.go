@@ -55,6 +55,7 @@ type MxCell struct {
 	Style      string      `xml:"style,attr,omitempty"`
 	Parent     string      `xml:"parent,attr,omitempty"`
 	Vertex     string      `xml:"vertex,attr,omitempty"`
+	Edge       string      `xml:"edge,attr,omitempty"`
 	MxGeometry *MxGeometry `xml:"mxGeometry,omitempty"`
 }
 
