@@ -36,8 +36,6 @@ func main() {
 		log.Println("successfully run migrations")
 	}
 
-	router := http.NewServeMux()
-
 	usersRepo := users.NewRepo(db)
 	usersService := users.NewService(usersRepo)
 	usersHandlers, err := users.NewHandlers(usersService)
@@ -88,6 +86,8 @@ func main() {
 		adminRoutes.All(),
 		usersRoutes.All(),
 	)
+
+	router := http.NewServeMux()
 
 	for _, r := range routes {
 		router.HandleFunc(fmt.Sprintf("%s %s", r.HTTPMethod, r.Path), r.Handler)
