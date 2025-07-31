@@ -18,7 +18,35 @@ docker compose up
 
 ### Examples
 
-Obtaining pull request data from GitHub by URLs:
+#### Generating Pull Request Gantt DrawIO file
+
+Generate a Gantt chart DrawIO file from all pull requests in a GitHub repository:
+
+```graphql
+query generatePullRequestsGantt {
+  solutions {
+    analysis {
+      information {
+        github(url: "https://github.com/graphql-go/graphql") {
+          generatePullRequestsGantt {
+            uuid
+            filePath
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+This query will:
+1. Fetch all pull requests from the specified GitHub repository
+2. Generate a Gantt chart DrawIO file using pull request titles instead of task names
+3. Store the file in `diagrams/gantt/<uuid>.drawio`
+4. Cache the file content as bytes using the UUID as the key
+5. Return the UUID and file path of the generated file
+
+#### Obtaining pull request data from GitHub by URLs
 
 ```graphql
 query {

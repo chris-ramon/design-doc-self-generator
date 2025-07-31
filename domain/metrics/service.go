@@ -3,15 +3,21 @@ package metrics
 import (
 	"context"
 	"encoding/json"
+	"encoding/xml"
 	"errors"
 	"fmt"
 	"net/http"
+	"os"
+	"path/filepath"
+	"strconv"
 
 	githubClient "github.com/google/go-github/github"
+	"github.com/google/uuid"
 
 	cachePkg "github.com/chris-ramon/golang-scaffolding/cache"
 	"github.com/chris-ramon/golang-scaffolding/domain/metrics/github"
 	"github.com/chris-ramon/golang-scaffolding/domain/metrics/types"
+	"github.com/chris-ramon/golang-scaffolding/drawio/gantt"
 )
 
 type service struct {
@@ -38,6 +44,15 @@ type FindAllPullRequestsResult struct {
 }
 
 type FindAllPullRequestsParams struct {
+	RepositoryURL string
+}
+
+type GeneratePullRequestsGanttResult struct {
+	UUID     string
+	FilePath string
+}
+
+type GeneratePullRequestsGanttParams struct {
 	RepositoryURL string
 }
 
@@ -260,6 +275,233 @@ func (s *service) FindAllPullRequests(ctx context.Context, params FindAllPullReq
 	s.cacheFindAllPullRequestsValue(key, result)
 
 	return result, nil
+}
+
+// `generatePullRequestsGanttCacheKey` returns cache key of `GeneratePullRequestsGantt`.
+func (s *service) generatePullRequestsGanttCacheKey(params GeneratePullRequestsGanttParams) (string, error) {
+	key, err := json.Marshal(params)
+	if err != nil {
+		return "", err
+	}
+
+	return string(key), nil
+}
+
+// `getGeneratePullRequestsGanttCacheValue` returns cached data of `GeneratePullRequestsGantt`.
+func (s *service) getGeneratePullRequestsGanttCacheValue(data any) (*GeneratePullRequestsGanttResult, error) {
+	result, ok := data.(*GeneratePullRequestsGanttResult)
+	if !ok {
+		return nil, errors.New("unexpected type")
+	}
+
+	return result, nil
+}
+
+// `cacheGeneratePullRequestsGanttValue` caches given result of `GeneratePullRequestsGantt`.
+func (s *service) cacheGeneratePullRequestsGanttValue(key string, data any) {
+	s.cache.Add(key, data)
+}
+
+func (s *service) GeneratePullRequestsGantt(ctx context.Context, params GeneratePullRequestsGanttParams) (*GeneratePullRequestsGanttResult, error) {
+	key, err := s.generatePullRequestsGanttCacheKey(params)
+	if err != nil {
+		return nil, err
+	}
+
+	generatePullRequestsGanttCacheVal, found := s.cache.Get(key)
+	if found {
+		return s.getGeneratePullRequestsGanttCacheValue(generatePullRequestsGanttCacheVal)
+	}
+
+	// Get all pull requests for the repository
+	findAllPRParams := FindAllPullRequestsParams{
+		RepositoryURL: params.RepositoryURL,
+	}
+
+	findAllPullRequestsResult, err := s.FindAllPullRequests(ctx, findAllPRParams)
+	if err != nil {
+		return nil, err
+	}
+
+	// Generate UUID for the file
+	fileUUID := uuid.New().String()
+
+	// Generate the Gantt DrawIO file
+	drawioContent, err := s.generateGanttDrawIOFromPullRequests(findAllPullRequestsResult.PullRequests)
+	if err != nil {
+		return nil, err
+	}
+
+	// Create the file path
+	filePath := filepath.Join("diagrams", "gantt", fileUUID+".drawio")
+
+	// Ensure the directory exists
+	if err := os.MkdirAll(filepath.Dir(filePath), 0755); err != nil {
+		return nil, fmt.Errorf("failed to create directory: %w", err)
+	}
+
+	// Write the file
+	if err := os.WriteFile(filePath, drawioContent, 0644); err != nil {
+		return nil, fmt.Errorf("failed to write DrawIO file: %w", err)
+	}
+
+	// Cache the file content as bytes
+	s.cache.Add(fileUUID, drawioContent)
+
+	result := &GeneratePullRequestsGanttResult{
+		UUID:     fileUUID,
+		FilePath: filePath,
+	}
+
+	s.cacheGeneratePullRequestsGanttValue(key, result)
+
+	return result, nil
+}
+
+func (s *service) generateGanttDrawIOFromPullRequests(pullRequests []*types.PullRequest) ([]byte, error) {
+	// Read the default template
+	templatePath := filepath.Join("diagrams", "gantt", "default.drawio")
+	templateData, err := os.ReadFile(templatePath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read template file: %w", err)
+	}
+
+	// Parse the template
+	var mxFile gantt.MxFile
+	if err := xml.Unmarshal(templateData, &mxFile); err != nil {
+		return nil, fmt.Errorf("failed to parse template XML: %w", err)
+	}
+
+	if len(mxFile.Diagrams) == 0 {
+		return nil, errors.New("template has no diagrams")
+	}
+
+	// Clear existing cells except for the root cells (0 and 1)
+	diagram := &mxFile.Diagrams[0]
+	rootCells := []gantt.MxCell{}
+	for _, cell := range diagram.MxGraphModel.Root.Cells {
+		if cell.ID == "0" || cell.ID == "1" {
+			rootCells = append(rootCells, cell)
+		}
+	}
+	diagram.MxGraphModel.Root.Cells = rootCells
+
+	// Generate cells for pull requests
+	startY := 380.0
+	rowHeight := 20.0
+	
+	for i, pr := range pullRequests {
+		if pr.CreatedAt == nil || pr.MergedAt == nil {
+			continue
+		}
+
+		y := startY + float64(i)*rowHeight
+		cellID := strconv.Itoa(i + 63) // Start from 63 like in the template
+
+		// Task number cell
+		numberCell := gantt.MxCell{
+			ID:     cellID,
+			Value:  strconv.Itoa(i + 1),
+			Style:  "strokeColor=#DEEDFF;fillColor=#ADC3D9",
+			Parent: "1",
+			Vertex: "1",
+			MxGeometry: &gantt.MxGeometry{
+				X:      "86.5",
+				Y:      fmt.Sprintf("%.1f", y),
+				Width:  "40",
+				Height: "20",
+				As:     "geometry",
+			},
+		}
+
+		// Task name cell (PR title)
+		nameCell := gantt.MxCell{
+			ID:     cellID + "1",
+			Value:  pr.Title,
+			Style:  "align=left;strokeColor=#DEEDFF;fillColor=#ADC3D9",
+			Parent: "1",
+			Vertex: "1",
+			MxGeometry: &gantt.MxGeometry{
+				X:      "126.5",
+				Y:      fmt.Sprintf("%.1f", y),
+				Width:  "320",
+				Height: "20",
+				As:     "geometry",
+			},
+		}
+
+		// Duration cell
+		duration := pr.MergedAt.Sub(*pr.CreatedAt)
+		durationDays := int(duration.Hours() / 24)
+		if durationDays == 0 {
+			durationDays = 1
+		}
+		durationText := fmt.Sprintf("%d days", durationDays)
+		if durationDays == 1 {
+			durationText = "1 day"
+		}
+
+		durationCell := gantt.MxCell{
+			ID:     cellID + "2",
+			Value:  durationText,
+			Style:  "strokeColor=#DEEDFF;fillColor=#ADC3D9",
+			Parent: "1",
+			Vertex: "1",
+			MxGeometry: &gantt.MxGeometry{
+				X:      "446.5",
+				Y:      fmt.Sprintf("%.1f", y),
+				Width:  "80",
+				Height: "20",
+				As:     "geometry",
+			},
+		}
+
+		// Start date cell
+		startDateCell := gantt.MxCell{
+			ID:     cellID + "3",
+			Value:  pr.CreatedAt.Format("02.01.06"),
+			Style:  "strokeColor=#DEEDFF;fillColor=#ADC3D9",
+			Parent: "1",
+			Vertex: "1",
+			MxGeometry: &gantt.MxGeometry{
+				X:      "526.5",
+				Y:      fmt.Sprintf("%.1f", y),
+				Width:  "80",
+				Height: "20",
+				As:     "geometry",
+			},
+		}
+
+		// End date cell
+		endDateCell := gantt.MxCell{
+			ID:     cellID + "4",
+			Value:  pr.MergedAt.Format("02.01.06"),
+			Style:  "strokeColor=#DEEDFF;fillColor=#ADC3D9",
+			Parent: "1",
+			Vertex: "1",
+			MxGeometry: &gantt.MxGeometry{
+				X:      "606.5",
+				Y:      fmt.Sprintf("%.1f", y),
+				Width:  "80",
+				Height: "20",
+				As:     "geometry",
+			},
+		}
+
+		// Add all cells to the diagram
+		diagram.MxGraphModel.Root.Cells = append(diagram.MxGraphModel.Root.Cells,
+			numberCell, nameCell, durationCell, startDateCell, endDateCell)
+	}
+
+	// Marshal back to XML
+	output, err := xml.MarshalIndent(mxFile, "", "  ")
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal XML: %w", err)
+	}
+
+	// Add XML declaration
+	xmlDeclaration := []byte(`<?xml version="1.0" encoding="UTF-8"?>` + "\n")
+	return append(xmlDeclaration, output...), nil
 }
 
 func NewService(cache *cachePkg.Cache, HTTPClient *http.Client) (*service, error) {
