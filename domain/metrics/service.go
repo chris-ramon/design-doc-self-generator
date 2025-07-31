@@ -376,30 +376,44 @@ func (s *service) generateGanttDrawIOFromPullRequests(pullRequests []*types.Pull
 		return nil, errors.New("template has no diagrams")
 	}
 
-	// Keep header and calendar cells, remove only task rows (ID >= 63)
+	// Keep header and calendar cells, remove only task rows (ID 63-241 based on template analysis)
 	diagram := &mxFile.Diagrams[0]
 	preservedCells := []gantt.MxCell{}
+	maxPreservedID := 0
+	
 	for _, cell := range diagram.MxGraphModel.Root.Cells {
 		// Parse cell ID as integer to check if it's a task row
-		if cellIDInt, err := strconv.Atoi(cell.ID); err != nil || cellIDInt < 63 {
-			// Keep root cells, header cells, and calendar elements (ID < 63 or non-numeric)
+		if cellIDInt, err := strconv.Atoi(cell.ID); err != nil {
+			// Keep non-numeric IDs (like diagram ID)
 			preservedCells = append(preservedCells, cell)
+		} else if cellIDInt < 63 || cellIDInt > 241 {
+			// Keep header cells (< 63) and calendar elements (> 241)
+			preservedCells = append(preservedCells, cell)
+			if cellIDInt > maxPreservedID {
+				maxPreservedID = cellIDInt
+			}
 		}
-		// Skip task rows (ID >= 63)
+		// Skip task rows (ID 63-241)
 	}
 	diagram.MxGraphModel.Root.Cells = preservedCells
 
 	// Generate cells for pull requests
-	startY := 380.0
-	rowHeight := 20.0
+	startY := 380
+	rowHeight := 20
+	
+	// Start new IDs after the highest preserved ID to avoid collisions
+	nextID := maxPreservedID + 1
+	if nextID < 63 {
+		nextID = 63 // Ensure we start at least at 63 for task rows
+	}
 	
 	for i, pr := range pullRequests {
 		if pr.CreatedAt == nil || pr.MergedAt == nil {
 			continue
 		}
 
-		y := startY + float64(i)*rowHeight
-		baseID := 63 + i*5 // Each PR uses 5 cells, starting from ID 63
+		y := startY + i*rowHeight
+		baseID := nextID + i*5 // Each PR uses 5 cells, avoid ID collisions
 
 		// Task number cell
 		numberCell := gantt.MxCell{
@@ -410,7 +424,7 @@ func (s *service) generateGanttDrawIOFromPullRequests(pullRequests []*types.Pull
 			Vertex: "1",
 			MxGeometry: &gantt.MxGeometry{
 				X:      "86.5",
-				Y:      fmt.Sprintf("%.1f", y),
+				Y:      strconv.Itoa(y),
 				Width:  "40",
 				Height: "20",
 				As:     "geometry",
@@ -426,7 +440,7 @@ func (s *service) generateGanttDrawIOFromPullRequests(pullRequests []*types.Pull
 			Vertex: "1",
 			MxGeometry: &gantt.MxGeometry{
 				X:      "126.5",
-				Y:      fmt.Sprintf("%.1f", y),
+				Y:      strconv.Itoa(y),
 				Width:  "320",
 				Height: "20",
 				As:     "geometry",
@@ -452,7 +466,7 @@ func (s *service) generateGanttDrawIOFromPullRequests(pullRequests []*types.Pull
 			Vertex: "1",
 			MxGeometry: &gantt.MxGeometry{
 				X:      "446.5",
-				Y:      fmt.Sprintf("%.1f", y),
+				Y:      strconv.Itoa(y),
 				Width:  "80",
 				Height: "20",
 				As:     "geometry",
@@ -468,7 +482,7 @@ func (s *service) generateGanttDrawIOFromPullRequests(pullRequests []*types.Pull
 			Vertex: "1",
 			MxGeometry: &gantt.MxGeometry{
 				X:      "526.5",
-				Y:      fmt.Sprintf("%.1f", y),
+				Y:      strconv.Itoa(y),
 				Width:  "80",
 				Height: "20",
 				As:     "geometry",
@@ -484,7 +498,7 @@ func (s *service) generateGanttDrawIOFromPullRequests(pullRequests []*types.Pull
 			Vertex: "1",
 			MxGeometry: &gantt.MxGeometry{
 				X:      "606.5",
-				Y:      fmt.Sprintf("%.1f", y),
+				Y:      strconv.Itoa(y),
 				Width:  "80",
 				Height: "20",
 				As:     "geometry",
