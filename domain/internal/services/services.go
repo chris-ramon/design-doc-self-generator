@@ -25,6 +25,7 @@ type SolutionService interface {
 type MetricsService interface {
 	FindPullRequests(ctx context.Context, params metricTypes.FindPullRequestsParams) (*metrics.FindPullRequestsResult, error)
 	FindAllPullRequests(ctx context.Context, params metrics.FindAllPullRequestsParams) (*metrics.FindAllPullRequestsResult, error)
+	GeneratePullRequestsGantt(ctx context.Context, params metrics.GeneratePullRequestsGanttParams) (*metrics.GeneratePullRequestsGanttResult, error)
 }
 
 type Services struct {

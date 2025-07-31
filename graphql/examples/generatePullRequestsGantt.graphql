@@ -1,0 +1,14 @@
+query generatePullRequestsGantt {
+  solutions {
+    analysis {
+      information {
+        github(url: "https://github.com/graphql-go/graphql") {
+          generatePullRequestsGantt {
+            uuid
+            filePath
+          }
+        }
+      }
+    }
+  }
+}

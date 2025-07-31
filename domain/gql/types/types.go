@@ -1,6 +1,8 @@
 package types
 
 import (
+	"fmt"
+
 	"github.com/graphql-go/graphql"
 
 	"github.com/chris-ramon/golang-scaffolding/domain/gql/util"
@@ -82,6 +84,20 @@ var InformationType = graphql.NewObject(graphql.ObjectConfig{
 	},
 })
 
+var GanttResultType = graphql.NewObject(graphql.ObjectConfig{
+	Name: "GanttResultType",
+	Fields: graphql.Fields{
+		"uuid": &graphql.Field{
+			Description: "The UUID of the generated Gantt file.",
+			Type:        graphql.String,
+		},
+		"filePath": &graphql.Field{
+			Description: "The file path of the generated Gantt file.",
+			Type:        graphql.String,
+		},
+	},
+})
+
 var GitHubType = graphql.NewObject(graphql.ObjectConfig{
 	Name: "GitHubType",
 	Fields: graphql.Fields{
@@ -90,6 +106,41 @@ var GitHubType = graphql.NewObject(graphql.ObjectConfig{
 			Type:        MetricsType,
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				return p.Source, nil
+			},
+		},
+		"generatePullRequestsGantt": &graphql.Field{
+			Description: "Generate a Gantt chart DrawIO file from pull requests.",
+			Type:        GanttResultType,
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				srvs, err := util.ServicesFromResolveParams(p)
+				if err != nil {
+					return nil, err
+				}
+
+				// Get the repository URL from the parent
+				parent, ok := p.Source.(map[string]interface{})
+				if !ok {
+					return nil, fmt.Errorf("invalid parent source")
+				}
+
+				repoURL, exists := parent["url"]
+				if !exists || repoURL == nil {
+					return nil, fmt.Errorf("repository URL is required")
+				}
+
+				params := metrics.GeneratePullRequestsGanttParams{
+					RepositoryURL: repoURL.(string),
+				}
+
+				result, err := srvs.MetricsService.GeneratePullRequestsGantt(p.Context, params)
+				if err != nil {
+					return nil, err
+				}
+
+				return map[string]interface{}{
+					"uuid":     result.UUID,
+					"filePath": result.FilePath,
+				}, nil
 			},
 		},
 	},
@@ -208,3 +259,4 @@ var ContributorType = graphql.NewObject(graphql.ObjectConfig{
 		},
 	},
 })
+
