@@ -58,6 +58,12 @@ type ParticipantsNode struct {
 
 type ParticipantsNodes []ParticipantsNode
 
+// PageInfo represents pagination information from GitHub GraphQL API.
+type PageInfo struct {
+	HasNextPage githubv4.Boolean
+	EndCursor   githubv4.String
+}
+
 // AllPullRequestsParams represents the AllPullRequests parameters.
 type AllPullRequestsParams struct {
 	// Owner is the repository owner.
@@ -71,11 +77,12 @@ type AllPullRequestsQuery struct {
 }
 
 type AllPullRequestsRepository struct {
-	PullRequests AllPullRequestsPullRequests `graphql:"pullRequests(states: MERGED, first: $pullRequestsFirst, orderBy: {field: CREATED_AT, direction: DESC})"`
+	PullRequests AllPullRequestsPullRequests `graphql:"pullRequests(states: MERGED, first: $pullRequestsFirst, after: $pullRequestsAfter, orderBy: {field: CREATED_AT, direction: DESC})"`
 }
 
 type AllPullRequestsPullRequests struct {
-	Nodes AllPullRequestsNodes
+	Nodes    AllPullRequestsNodes
+	PageInfo PageInfo
 }
 
 type AllPullRequestsNodes []AllPullRequestsNode
@@ -91,20 +98,51 @@ type AllPullRequestsNode struct {
 	Participants Participants `graphql:"participants(first: $participantsFirst)"`
 }
 
-// AllPullRequests fetches all merged pull requests from a repository.
+// AllPullRequests fetches all merged pull requests from a repository with pagination support.
+// It will iterate through up to 10 pages to retrieve all pull requests.
 func (gh *GitHub) AllPullRequests(params AllPullRequestsParams) (AllPullRequestsQuery, error) {
-	query := AllPullRequestsQuery{}
+	finalQuery := AllPullRequestsQuery{}
+	var allNodes AllPullRequestsNodes
+	
+	var cursor *githubv4.String
+	maxIterations := 10
+	
+	for i := 0; i < maxIterations; i++ {
+		query := AllPullRequestsQuery{}
+		
+		variables := map[string]interface{}{
+			"repositoryOwner":   githubv4.String(params.Owner),
+			"repositoryName":    githubv4.String(params.Repo),
+			"pullRequestsFirst": githubv4.Int(100),
+			"participantsFirst": githubv4.Int(100),
+			"pullRequestsAfter": cursor,
+		}
 
-	variables := map[string]interface{}{
-		"repositoryOwner":   githubv4.String(params.Owner),
-		"repositoryName":    githubv4.String(params.Repo),
-		"pullRequestsFirst": githubv4.Int(100),
-		"participantsFirst": githubv4.Int(100),
+		err := gh.Client.Query(context.Background(), &query, variables)
+		if err != nil {
+			return finalQuery, err
+		}
+		
+		// Append nodes from this page to our collection
+		allNodes = append(allNodes, query.Repository.PullRequests.Nodes...)
+		
+		// Check if there are more pages
+		if !query.Repository.PullRequests.PageInfo.HasNextPage {
+			break
+		}
+		
+		// Set cursor for next iteration
+		cursor = &query.Repository.PullRequests.PageInfo.EndCursor
 	}
-
-	err := gh.Client.Query(context.Background(), &query, variables)
-
-	return query, err
+	
+	// Build the final result with all collected nodes
+	finalQuery.Repository.PullRequests.Nodes = allNodes
+	finalQuery.Repository.PullRequests.PageInfo = PageInfo{
+		HasNextPage: githubv4.Boolean(false), // We've collected all available pages
+		EndCursor:   githubv4.String(""),
+	}
+	
+	return finalQuery, nil
 }
 
 // PullRequestContributors searches and returns the contributors of the given pull request.

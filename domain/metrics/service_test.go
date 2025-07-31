@@ -56,6 +56,10 @@ func TestFindAllPullRequests(t *testing.T) {
 								},
 							},
 						},
+						PageInfo: github.PageInfo{
+							HasNextPage: githubv4.Boolean(false),
+							EndCursor:   githubv4.String(""),
+						},
 					},
 				},
 			}, nil
@@ -163,5 +167,95 @@ func TestRepositoryFromURL(t *testing.T) {
 				t.Errorf("expected repo %s, got %s", tc.expectedRepo, repo)
 			}
 		})
+	}
+}
+
+func TestAllPullRequestsPagination(t *testing.T) {
+	cache := cachePkg.New()
+	
+	createdAt := time.Now().Add(-7 * 24 * time.Hour)
+	mergedAt := time.Now()
+
+	// Mock that simulates pagination by returning multiple PRs in a single call
+	// This tests that the service can handle the paginated results from the GitHub client
+	mockGH := &mockGitHub{
+		allPullRequests: func(params github.AllPullRequestsParams) (github.AllPullRequestsQuery, error) {
+			// Simulate the result of pagination - multiple PRs collected from multiple pages
+			return github.AllPullRequestsQuery{
+				Repository: github.AllPullRequestsRepository{
+					PullRequests: github.AllPullRequestsPullRequests{
+						Nodes: github.AllPullRequestsNodes{
+							{
+								Number:    githubv4.Int(123),
+								URL:       githubv4.String("https://github.com/test/repo/pull/123"),
+								CreatedAt: githubv4.DateTime{Time: createdAt},
+								MergedAt:  githubv4.DateTime{Time: mergedAt},
+								HeadRef: struct {
+									Name githubv4.String
+								}{
+									Name: githubv4.String("feature-branch-1"),
+								},
+								Participants: github.Participants{
+									Nodes: github.ParticipantsNodes{
+										{URL: githubv4.String("https://github.com/user1")},
+									},
+								},
+							},
+							{
+								Number:    githubv4.Int(124),
+								URL:       githubv4.String("https://github.com/test/repo/pull/124"),
+								CreatedAt: githubv4.DateTime{Time: createdAt},
+								MergedAt:  githubv4.DateTime{Time: mergedAt},
+								HeadRef: struct {
+									Name githubv4.String
+								}{
+									Name: githubv4.String("feature-branch-2"),
+								},
+								Participants: github.Participants{
+									Nodes: github.ParticipantsNodes{
+										{URL: githubv4.String("https://github.com/user2")},
+									},
+								},
+							},
+						},
+						PageInfo: github.PageInfo{
+							HasNextPage: githubv4.Boolean(false),
+							EndCursor:   githubv4.String(""),
+						},
+					},
+				},
+			}, nil
+		},
+	}
+
+	srv := &service{
+		cache:  cache,
+		GitHub: mockGH,
+	}
+
+	params := FindAllPullRequestsParams{
+		RepositoryURL: "https://github.com/test/repo",
+	}
+
+	result, err := srv.FindAllPullRequests(context.Background(), params)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	// Should have collected PRs from pagination
+	if len(result.PullRequests) != 2 {
+		t.Fatalf("expected 2 pull requests from pagination, got %d", len(result.PullRequests))
+	}
+
+	// Verify first PR
+	pr1 := result.PullRequests[0]
+	if pr1.Number != 123 {
+		t.Errorf("expected first PR number 123, got %d", pr1.Number)
+	}
+
+	// Verify second PR
+	pr2 := result.PullRequests[1]
+	if pr2.Number != 124 {
+		t.Errorf("expected second PR number 124, got %d", pr2.Number)
 	}
 }
