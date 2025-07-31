@@ -43,19 +43,19 @@ func (s *service) findPullRequestsCacheKey(params types.FindPullRequestsParams) 
 	return string(key), nil
 }
 
-// `findPullRequestsCacheValue` returns cached data of `FindPullRequests`.
-func (s *service) findPullRequestsCacheValue(data any) (*FindPullRequestsResult, error) {
-	d, ok := data.(string)
+// `getFindPullRequestsCacheValue` returns cached data of `FindPullRequests`.
+func (s *service) getFindPullRequestsCacheValue(data any) (*FindPullRequestsResult, error) {
+	result, ok := data.(*FindPullRequestsResult)
 	if !ok {
 		return nil, errors.New("unexpected type")
 	}
 
-	result := &FindPullRequestsResult{}
-	if err := json.Unmarshal([]byte(d), result); err != nil {
-		return result, nil
-	}
-
 	return result, nil
+}
+
+// `cacheFindPullRequestsValue` caches given result of `FindPullRequests`.
+func (s *service) cacheFindPullRequestsValue(key string, data any) {
+	s.cache.Add(key, data)
 }
 
 func (s *service) FindPullRequests(ctx context.Context, params types.FindPullRequestsParams) (*FindPullRequestsResult, error) {
@@ -66,7 +66,7 @@ func (s *service) FindPullRequests(ctx context.Context, params types.FindPullReq
 
 	findPullRequestsCacheVal, found := s.cache.Get(key)
 	if found {
-		return s.findPullRequestsCacheValue(findPullRequestsCacheVal)
+		return s.getFindPullRequestsCacheValue(findPullRequestsCacheVal)
 	}
 
 	result := &FindPullRequestsResult{}
@@ -79,6 +79,8 @@ func (s *service) FindPullRequests(ctx context.Context, params types.FindPullReq
 
 		result.PullRequests = append(result.PullRequests, r.PullRequest)
 	}
+
+	s.cacheFindPullRequestsValue(key, result)
 
 	return result, nil
 }
