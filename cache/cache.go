@@ -20,8 +20,8 @@ func (c *Cache) Add(key string, value any) {
 }
 
 func (c *Cache) Get(key string) (any, bool) {
-	c.mu.Lock()
-	defer c.mu.Unlock()
+	c.mu.RLock()
+	defer c.mu.RUnlock()
 	return c.cache.Get(lru.Key(key))
 }
 
