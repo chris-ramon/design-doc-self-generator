@@ -1,16 +1,27 @@
 package cache
 
-import "github.com/golang/groupcache/lru"
+import (
+	"sync"
+
+	"github.com/golang/groupcache/lru"
+)
 
 type Cache struct {
+	// mu guards cache.
+	mu sync.RWMutex
+
 	cache *lru.Cache
 }
 
 func (c *Cache) Add(key string, value any) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
 	c.cache.Add(lru.Key(key), value)
 }
 
 func (c *Cache) Get(key string) (any, bool) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
 	return c.cache.Get(lru.Key(key))
 }
 
