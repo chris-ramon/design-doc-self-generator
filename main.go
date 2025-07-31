@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"slices"
 
+	cachePkg "github.com/chris-ramon/golang-scaffolding/cache"
 	"github.com/chris-ramon/golang-scaffolding/config"
 	"github.com/chris-ramon/golang-scaffolding/db"
 	"github.com/chris-ramon/golang-scaffolding/domain/admin"
@@ -35,6 +36,9 @@ func main() {
 	} else {
 		log.Println("successfully run migrations")
 	}
+
+	cache := cachePkg.New()
+	log.Println(cache)
 
 	usersRepo := users.NewRepo(db)
 	usersService := users.NewService(usersRepo)
