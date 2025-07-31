@@ -30,8 +30,8 @@ func TestGanttResultType(t *testing.T) {
 
 func TestGitHubTypeGeneratePullRequestsGantt(t *testing.T) {
 	// Test that the generatePullRequestsGantt field exists
-	fields := GitHubType.Fields()
-	ganttField, exists := fields["generatePullRequestsGantt"]
+	gitHubFields := GitHubType.Fields()
+	ganttField, exists := gitHubFields["generatePullRequestsGantt"]
 	if !exists {
 		t.Error("Expected 'generatePullRequestsGantt' field to exist")
 	}
@@ -72,8 +72,8 @@ func TestGeneratePullRequestsGanttResolver(t *testing.T) {
 	}
 
 	// Get the resolver function
-	fields := GitHubType.Fields()
-	ganttField := fields["generatePullRequestsGantt"]
+	gitHubFields := GitHubType.Fields()
+	ganttField := gitHubFields["generatePullRequestsGantt"]
 	
 	// Test that the resolver doesn't panic (we can't test the full functionality without GitHub token)
 	defer func() {

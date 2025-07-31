@@ -87,14 +87,12 @@ func TestGenerateGanttDrawIOFromPullRequests(t *testing.T) {
 	}
 
 	// Write to a test file to verify it works
-	testFilePath := filepath.Join("test_gantt.drawio")
+	tempDir := t.TempDir()
+	testFilePath := filepath.Join(tempDir, "test_gantt.drawio")
 	err = os.WriteFile(testFilePath, drawioContent, 0644)
 	if err != nil {
 		t.Fatalf("Failed to write test file: %v", err)
 	}
-
-	// Clean up
-	defer os.Remove(testFilePath)
 
 	t.Logf("Successfully generated Gantt DrawIO file with %d cells", len(diagram.MxGraphModel.Root.Cells))
 }
