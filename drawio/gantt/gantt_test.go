@@ -3,12 +3,19 @@ package gantt
 import (
 	"encoding/xml"
 	"os"
+	"path/filepath"
+	"runtime"
 	"testing"
 )
 
 func TestParseDrawIOFile(t *testing.T) {
+	// Get the path to the DrawIO file using runtime.Caller
+	_, filename, _, _ := runtime.Caller(0)
+	repoRoot := filepath.Dir(filepath.Dir(filepath.Dir(filename)))
+	drawioPath := filepath.Join(repoRoot, "diagrams", "gantt", "default.drawio")
+	
 	// Read the test DrawIO file
-	data, err := os.ReadFile("../../diagrams/gantt/default.drawio")
+	data, err := os.ReadFile(drawioPath)
 	if err != nil {
 		t.Fatalf("Failed to read DrawIO file: %v", err)
 	}

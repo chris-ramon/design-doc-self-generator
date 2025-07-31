@@ -4,14 +4,22 @@ import (
 	"encoding/xml"
 	"fmt"
 	"os"
+	"path/filepath"
+	"runtime"
 	"strings"
+	"unicode"
 )
 
-// ExampleParseGanttChart demonstrates how to parse a DrawIO Gantt chart
+// DemoParseGanttChart demonstrates how to parse a DrawIO Gantt chart
 // and extract task information
-func ExampleParseGanttChart() {
+func DemoParseGanttChart() {
+	// Get the path to the DrawIO file using runtime.Caller
+	_, filename, _, _ := runtime.Caller(0)
+	repoRoot := filepath.Dir(filepath.Dir(filepath.Dir(filename)))
+	drawioPath := filepath.Join(repoRoot, "diagrams", "gantt", "default.drawio")
+	
 	// Read the DrawIO file
-	data, err := os.ReadFile("../../diagrams/gantt/default.drawio")
+	data, err := os.ReadFile(drawioPath)
 	if err != nil {
 		fmt.Printf("Error reading file: %v\n", err)
 		return
@@ -83,15 +91,8 @@ func isTaskCell(cell MxCell) bool {
 		return false
 	}
 	
-	// Skip cells that look like dates (contain dots and numbers, or month/day patterns)
-	if strings.Contains(value, ".") && len(value) <= 10 {
-		return false
-	}
-	
-	// Skip date patterns like "7 May 12", "14 May 12", etc.
-	if strings.Contains(strings.ToLower(value), "may") || 
-	   strings.Contains(strings.ToLower(value), "apr") ||
-	   strings.Contains(strings.ToLower(value), "jun") {
+	// Skip date-like strings
+	if isDateLike(value) {
 		return false
 	}
 	
@@ -120,12 +121,36 @@ func isTaskCell(cell MxCell) bool {
 	return true
 }
 
+// isDateLike checks if a string looks like a date
+func isDateLike(s string) bool {
+	lower := strings.ToLower(s)
+	
+	// Check for date patterns with dots (like "16.04.12")
+	if strings.Contains(s, ".") && len(s) <= 10 {
+		return true
+	}
+	
+	// Check for month names in date patterns (like "7 May 12", "16 Apr 12")
+	months := []string{"jan", "feb", "mar", "apr", "may", "jun", 
+					  "jul", "aug", "sep", "oct", "nov", "dec"}
+	for _, month := range months {
+		if strings.Contains(lower, month) {
+			return true
+		}
+	}
+	
+	return false
+}
+
 // isNumeric checks if a string contains only digits
 func isNumeric(s string) bool {
+	if len(s) == 0 {
+		return false
+	}
 	for _, r := range s {
-		if r < '0' || r > '9' {
+		if !unicode.IsDigit(r) {
 			return false
 		}
 	}
-	return len(s) > 0
+	return true
 }
