@@ -4,9 +4,9 @@ import (
 	"github.com/graphql-go/graphql"
 
 	"github.com/chris-ramon/golang-scaffolding/domain/gql/util"
+	"github.com/chris-ramon/golang-scaffolding/domain/metrics"
 	"github.com/chris-ramon/golang-scaffolding/domain/metrics/github"
 	"github.com/chris-ramon/golang-scaffolding/domain/metrics/mappers"
-	metricsTypes "github.com/chris-ramon/golang-scaffolding/domain/metrics"
 )
 
 var CurrentUserType = graphql.NewObject(graphql.ObjectConfig{
@@ -88,6 +88,9 @@ var GitHubType = graphql.NewObject(graphql.ObjectConfig{
 		"metrics": &graphql.Field{
 			Description: "The GitHub metrics.",
 			Type:        MetricsType,
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				return p.Source, nil
+			},
 		},
 	},
 })
@@ -113,7 +116,7 @@ var MetricsType = graphql.NewObject(graphql.ObjectConfig{
 				if parent, ok := p.Source.(map[string]interface{}); ok {
 					if repoURL, exists := parent["url"]; exists && repoURL != nil {
 						// Use FindAllPullRequests for repository URL
-						params := metricsTypes.FindAllPullRequestsParams{
+						params := metrics.FindAllPullRequestsParams{
 							RepositoryURL: repoURL.(string),
 						}
 

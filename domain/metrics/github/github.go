@@ -102,9 +102,9 @@ func (gh *GitHub) AllPullRequests(params AllPullRequestsParams) (AllPullRequests
 		"participantsFirst": githubv4.Int(100),
 	}
 
-	result := gh.Client.Query(context.Background(), &query, variables)
+	err := gh.Client.Query(context.Background(), &query, variables)
 
-	return query, result
+	return query, err
 }
 
 // PullRequestContributors searches and returns the contributors of the given pull request.
