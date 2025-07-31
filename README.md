@@ -1,6 +1,6 @@
 # Design Doc Self Generator
 
-Self-generates design doc.
+Self-generates design docs.
 
 ## Getting Started
 
