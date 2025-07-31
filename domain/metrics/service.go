@@ -22,7 +22,7 @@ type service struct {
 	HTTPClient *http.Client
 
 	// GitHub is the github component.
-	GitHub *github.GitHub
+	GitHub github.GitHubClient
 }
 
 type FindPullRequestsResult struct {
@@ -31,6 +31,14 @@ type FindPullRequestsResult struct {
 
 type findPullRequestsResult struct {
 	PullRequest *types.PullRequest
+}
+
+type FindAllPullRequestsResult struct {
+	PullRequests []*types.PullRequest
+}
+
+type FindAllPullRequestsParams struct {
+	RepositoryURL string
 }
 
 // `findPullRequestsCacheKey` returns cache key of `FindPullRequests`.
@@ -153,13 +161,101 @@ func (s *service) findPullRequests(ctx context.Context, param types.FindPullRequ
 	return result, nil
 }
 
+// `findAllPullRequestsCacheKey` returns cache key of `FindAllPullRequests`.
+func (s *service) findAllPullRequestsCacheKey(params FindAllPullRequestsParams) (string, error) {
+	key, err := json.Marshal(params)
+	if err != nil {
+		return "", err
+	}
+
+	return string(key), nil
+}
+
+// `getFindAllPullRequestsCacheValue` returns cached data of `FindAllPullRequests`.
+func (s *service) getFindAllPullRequestsCacheValue(data any) (*FindAllPullRequestsResult, error) {
+	result, ok := data.(*FindAllPullRequestsResult)
+	if !ok {
+		return nil, errors.New("unexpected type")
+	}
+
+	return result, nil
+}
+
+// `cacheFindAllPullRequestsValue` caches given result of `FindAllPullRequests`.
+func (s *service) cacheFindAllPullRequestsValue(key string, data any) {
+	s.cache.Add(key, data)
+}
+
+func (s *service) FindAllPullRequests(ctx context.Context, params FindAllPullRequestsParams) (*FindAllPullRequestsResult, error) {
+	key, err := s.findAllPullRequestsCacheKey(params)
+	if err != nil {
+		return nil, err
+	}
+
+	findAllPullRequestsCacheVal, found := s.cache.Get(key)
+	if found {
+		return s.getFindAllPullRequestsCacheValue(findAllPullRequestsCacheVal)
+	}
+
+	owner, repo, err := github.RepositoryFromURL(params.RepositoryURL)
+	if err != nil {
+		return nil, err
+	}
+
+	allPullRequestsParams := github.AllPullRequestsParams{
+		Owner: owner,
+		Repo:  repo,
+	}
+
+	r, err := s.GitHub.AllPullRequests(allPullRequestsParams)
+	if err != nil {
+		return nil, err
+	}
+
+	result := &FindAllPullRequestsResult{}
+
+	for _, prNode := range r.Repository.PullRequests.Nodes {
+		if prNode.MergedAt.Time.IsZero() || prNode.CreatedAt.Time.IsZero() {
+			continue
+		}
+
+		contributors := types.Contributors{}
+		for _, participant := range prNode.Participants.Nodes {
+			c := types.Contributor{
+				ProfileURL: string(participant.URL),
+			}
+			contributors = append(contributors, c)
+		}
+
+		duration := prNode.MergedAt.Time.Sub(prNode.CreatedAt.Time)
+		pr := &types.PullRequest{
+			Number:                int(prNode.Number),
+			Owner:                 owner,
+			Repo:                  repo,
+			Duration:              duration,
+			CreatedAt:             &prNode.CreatedAt.Time,
+			MergedAt:              &prNode.MergedAt.Time,
+			URL:                   string(prNode.URL),
+			Contributors:          contributors,
+			HeadRefName:           string(prNode.HeadRef.Name),
+			FormattedContributors: contributors.FormattedContributors(),
+		}
+
+		result.PullRequests = append(result.PullRequests, pr)
+	}
+
+	s.cacheFindAllPullRequestsValue(key, result)
+
+	return result, nil
+}
+
 func NewService(cache *cachePkg.Cache, HTTPClient *http.Client) (*service, error) {
-	github := github.NewGitHub()
+	gh := github.NewGitHub()
 
 	srv := &service{
 		cache:      cache,
 		HTTPClient: HTTPClient,
-		GitHub:     github,
+		GitHub:     gh,
 	}
 
 	return srv, nil

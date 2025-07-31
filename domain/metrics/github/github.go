@@ -10,6 +10,13 @@ import (
 	"github.com/chris-ramon/golang-scaffolding/domain/metrics/types"
 )
 
+// GitHubClient defines the interface for GitHub operations.
+type GitHubClient interface {
+	AllPullRequests(params AllPullRequestsParams) (AllPullRequestsQuery, error)
+	PullRequestContributors(params PullRequestContributorsParams) (PullRequestContributorsQuery, error)
+	Query(query any) error
+}
+
 // GitHub represents the GitHub component.
 type GitHub struct {
 	// Client is the GitHub client.
@@ -50,6 +57,55 @@ type ParticipantsNode struct {
 }
 
 type ParticipantsNodes []ParticipantsNode
+
+// AllPullRequestsParams represents the AllPullRequests parameters.
+type AllPullRequestsParams struct {
+	// Owner is the repository owner.
+	Owner string
+	// Repo is the repository name.
+	Repo string
+}
+
+type AllPullRequestsQuery struct {
+	Repository AllPullRequestsRepository `graphql:"repository(owner: $repositoryOwner, name: $repositoryName)"`
+}
+
+type AllPullRequestsRepository struct {
+	PullRequests AllPullRequestsPullRequests `graphql:"pullRequests(states: MERGED, first: $pullRequestsFirst, orderBy: {field: CREATED_AT, direction: DESC})"`
+}
+
+type AllPullRequestsPullRequests struct {
+	Nodes AllPullRequestsNodes
+}
+
+type AllPullRequestsNodes []AllPullRequestsNode
+
+type AllPullRequestsNode struct {
+	Number    githubv4.Int
+	URL       githubv4.String
+	CreatedAt githubv4.DateTime
+	MergedAt  githubv4.DateTime
+	HeadRef   struct {
+		Name githubv4.String
+	}
+	Participants Participants `graphql:"participants(first: $participantsFirst)"`
+}
+
+// AllPullRequests fetches all merged pull requests from a repository.
+func (gh *GitHub) AllPullRequests(params AllPullRequestsParams) (AllPullRequestsQuery, error) {
+	query := AllPullRequestsQuery{}
+
+	variables := map[string]interface{}{
+		"repositoryOwner":   githubv4.String(params.Owner),
+		"repositoryName":    githubv4.String(params.Repo),
+		"pullRequestsFirst": githubv4.Int(100),
+		"participantsFirst": githubv4.Int(100),
+	}
+
+	err := gh.Client.Query(context.Background(), &query, variables)
+
+	return query, err
+}
 
 // PullRequestContributors searches and returns the contributors of the given pull request.
 func (gh *GitHub) PullRequestContributors(params PullRequestContributorsParams) (PullRequestContributorsQuery, error) {

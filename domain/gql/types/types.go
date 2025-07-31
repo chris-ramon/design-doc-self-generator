@@ -4,6 +4,7 @@ import (
 	"github.com/graphql-go/graphql"
 
 	"github.com/chris-ramon/golang-scaffolding/domain/gql/util"
+	"github.com/chris-ramon/golang-scaffolding/domain/metrics"
 	"github.com/chris-ramon/golang-scaffolding/domain/metrics/github"
 	"github.com/chris-ramon/golang-scaffolding/domain/metrics/mappers"
 )
@@ -66,6 +67,17 @@ var InformationType = graphql.NewObject(graphql.ObjectConfig{
 		"github": &graphql.Field{
 			Description: "The GitHub information.",
 			Type:        GitHubType,
+			Args: graphql.FieldConfigArgument{
+				"url": &graphql.ArgumentConfig{
+					Type: graphql.String,
+				},
+			},
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				// The URL parameter will be passed down to the metrics resolver
+				return map[string]interface{}{
+					"url": p.Args["url"],
+				}, nil
+			},
 		},
 	},
 })
@@ -76,6 +88,9 @@ var GitHubType = graphql.NewObject(graphql.ObjectConfig{
 		"metrics": &graphql.Field{
 			Description: "The GitHub metrics.",
 			Type:        MetricsType,
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				return p.Source, nil
+			},
 		},
 	},
 })
@@ -92,12 +107,31 @@ var MetricsType = graphql.NewObject(graphql.ObjectConfig{
 				},
 			},
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-				urls, err := util.FieldsFromArgs[string](p.Args, "urls")
+				srvs, err := util.ServicesFromResolveParams(p)
 				if err != nil {
 					return nil, err
 				}
 
-				srvs, err := util.ServicesFromResolveParams(p)
+				// Check if we have a repository URL from the parent github field
+				if parent, ok := p.Source.(map[string]interface{}); ok {
+					if repoURL, exists := parent["url"]; exists && repoURL != nil {
+						// Use FindAllPullRequests for repository URL
+						params := metrics.FindAllPullRequestsParams{
+							RepositoryURL: repoURL.(string),
+						}
+
+						findAllPullRequestsResult, err := srvs.MetricsService.FindAllPullRequests(p.Context, params)
+						if err != nil {
+							return nil, err
+						}
+
+						pullRequests := mappers.PullRequestsFromTypeToAPI(findAllPullRequestsResult.PullRequests)
+						return pullRequests, nil
+					}
+				}
+
+				// Fallback to the original behavior with individual PR URLs
+				urls, err := util.FieldsFromArgs[string](p.Args, "urls")
 				if err != nil {
 					return nil, err
 				}
