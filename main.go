@@ -38,8 +38,6 @@ func main() {
 	}
 
 	cache := cachePkg.New()
-	cache.Add("1", 1)
-	log.Println(cache.Get("1"))
 
 	usersRepo := users.NewRepo(db)
 	usersService := users.NewService(usersRepo)
@@ -67,7 +65,7 @@ func main() {
 	}
 
 	HTTPClient := &http.Client{}
-	metricsService, err := metrics.NewService(HTTPClient)
+	metricsService, err := metrics.NewService(cache, HTTPClient)
 	if err != nil {
 		handleErr(err)
 	}
