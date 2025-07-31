@@ -5,7 +5,11 @@ Self-generates design doc.
 ## Getting Started
 
 ## Running
+1. Copy `.env.example` to `.env`
 
+2. Add env. variables to: `.env`.
+
+3. Run the app:
 ```
 docker compose up
 ```
