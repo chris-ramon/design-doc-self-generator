@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"runtime"
 	"testing"
 	"time"
 
@@ -15,12 +16,9 @@ import (
 )
 
 func TestGenerateGanttDrawIOFromPullRequests(t *testing.T) {
-	// Change to the root directory for the test
-	originalDir, _ := os.Getwd()
-	defer os.Chdir(originalDir)
-	
-	// Go up two levels to reach the root directory
-	os.Chdir("../..")
+	// Get the repository root directory using runtime.Caller
+	_, filename, _, _ := runtime.Caller(0)
+	repoRoot := filepath.Dir(filepath.Dir(filepath.Dir(filename)))
 	
 	// Create a test service
 	cache := cachePkg.New()
@@ -29,6 +27,11 @@ func TestGenerateGanttDrawIOFromPullRequests(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to create service: %v", err)
 	}
+	
+	// Temporarily override the template path resolution for testing
+	originalWd, _ := os.Getwd()
+	defer os.Chdir(originalWd)
+	os.Chdir(repoRoot)
 
 	// Create test pull requests
 	now := time.Now()

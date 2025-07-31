@@ -376,15 +376,18 @@ func (s *service) generateGanttDrawIOFromPullRequests(pullRequests []*types.Pull
 		return nil, errors.New("template has no diagrams")
 	}
 
-	// Clear existing cells except for the root cells (0 and 1)
+	// Keep header and calendar cells, remove only task rows (ID >= 63)
 	diagram := &mxFile.Diagrams[0]
-	rootCells := []gantt.MxCell{}
+	preservedCells := []gantt.MxCell{}
 	for _, cell := range diagram.MxGraphModel.Root.Cells {
-		if cell.ID == "0" || cell.ID == "1" {
-			rootCells = append(rootCells, cell)
+		// Parse cell ID as integer to check if it's a task row
+		if cellIDInt, err := strconv.Atoi(cell.ID); err != nil || cellIDInt < 63 {
+			// Keep root cells, header cells, and calendar elements (ID < 63 or non-numeric)
+			preservedCells = append(preservedCells, cell)
 		}
+		// Skip task rows (ID >= 63)
 	}
-	diagram.MxGraphModel.Root.Cells = rootCells
+	diagram.MxGraphModel.Root.Cells = preservedCells
 
 	// Generate cells for pull requests
 	startY := 380.0
@@ -396,11 +399,11 @@ func (s *service) generateGanttDrawIOFromPullRequests(pullRequests []*types.Pull
 		}
 
 		y := startY + float64(i)*rowHeight
-		cellID := strconv.Itoa(i + 63) // Start from 63 like in the template
+		baseID := 63 + i*5 // Each PR uses 5 cells, starting from ID 63
 
 		// Task number cell
 		numberCell := gantt.MxCell{
-			ID:     cellID,
+			ID:     strconv.Itoa(baseID),
 			Value:  strconv.Itoa(i + 1),
 			Style:  "strokeColor=#DEEDFF;fillColor=#ADC3D9",
 			Parent: "1",
@@ -416,7 +419,7 @@ func (s *service) generateGanttDrawIOFromPullRequests(pullRequests []*types.Pull
 
 		// Task name cell (PR title)
 		nameCell := gantt.MxCell{
-			ID:     cellID + "1",
+			ID:     strconv.Itoa(baseID + 1),
 			Value:  pr.Title,
 			Style:  "align=left;strokeColor=#DEEDFF;fillColor=#ADC3D9",
 			Parent: "1",
@@ -442,7 +445,7 @@ func (s *service) generateGanttDrawIOFromPullRequests(pullRequests []*types.Pull
 		}
 
 		durationCell := gantt.MxCell{
-			ID:     cellID + "2",
+			ID:     strconv.Itoa(baseID + 2),
 			Value:  durationText,
 			Style:  "strokeColor=#DEEDFF;fillColor=#ADC3D9",
 			Parent: "1",
@@ -458,7 +461,7 @@ func (s *service) generateGanttDrawIOFromPullRequests(pullRequests []*types.Pull
 
 		// Start date cell
 		startDateCell := gantt.MxCell{
-			ID:     cellID + "3",
+			ID:     strconv.Itoa(baseID + 3),
 			Value:  pr.CreatedAt.Format("02.01.06"),
 			Style:  "strokeColor=#DEEDFF;fillColor=#ADC3D9",
 			Parent: "1",
@@ -474,7 +477,7 @@ func (s *service) generateGanttDrawIOFromPullRequests(pullRequests []*types.Pull
 
 		// End date cell
 		endDateCell := gantt.MxCell{
-			ID:     cellID + "4",
+			ID:     strconv.Itoa(baseID + 4),
 			Value:  pr.MergedAt.Format("02.01.06"),
 			Style:  "strokeColor=#DEEDFF;fillColor=#ADC3D9",
 			Parent: "1",
