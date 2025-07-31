@@ -3,7 +3,7 @@ package cache
 import "github.com/golang/groupcache/lru"
 
 type Cache struct {
-	cache lru.Cache
+	cache *lru.Cache
 }
 
 func (c *Cache) Add(key string, value any) {
@@ -15,8 +15,11 @@ func (c *Cache) Get(key string) (any, bool) {
 }
 
 func New() *Cache {
+	// Initializes LRU cache with a reasonable 1k as max entries.
+	cache := lru.New(1000)
+
 	c := &Cache{
-		cache: lru.Cache{},
+		cache: cache,
 	}
 
 	return c
