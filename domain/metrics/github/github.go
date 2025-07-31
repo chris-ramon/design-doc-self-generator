@@ -60,8 +60,8 @@ type ParticipantsNodes []ParticipantsNode
 
 // PageInfo represents pagination information from GitHub GraphQL API.
 type PageInfo struct {
-	HasNextPage githubv4.Boolean
-	EndCursor   githubv4.String
+	HasNextPage githubv4.Boolean `graphql:"hasNextPage"`
+	EndCursor   githubv4.String  `graphql:"endCursor"`
 }
 
 // AllPullRequestsParams represents the AllPullRequests parameters.
@@ -82,7 +82,7 @@ type AllPullRequestsRepository struct {
 
 type AllPullRequestsPullRequests struct {
 	Nodes    AllPullRequestsNodes
-	PageInfo PageInfo
+	PageInfo PageInfo `graphql:"pageInfo"`
 }
 
 type AllPullRequestsNodes []AllPullRequestsNode
@@ -132,7 +132,8 @@ func (gh *GitHub) AllPullRequests(params AllPullRequestsParams) (AllPullRequests
 		}
 		
 		// Set cursor for next iteration
-		cursor = &query.Repository.PullRequests.PageInfo.EndCursor
+		next := query.Repository.PullRequests.PageInfo.EndCursor
+		cursor = &next
 	}
 	
 	// Build the final result with all collected nodes
