@@ -2,16 +2,22 @@ package metrics
 
 import (
 	"context"
+	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 
 	githubClient "github.com/google/go-github/github"
 
+	cachePkg "github.com/chris-ramon/golang-scaffolding/cache"
 	"github.com/chris-ramon/golang-scaffolding/domain/metrics/github"
 	"github.com/chris-ramon/golang-scaffolding/domain/metrics/types"
 )
 
 type service struct {
+	// cache is the internal cache component.
+	cache *cachePkg.Cache
+
 	// HTTPClient is the HTTP client used for GitHub API requests.
 	HTTPClient *http.Client
 
@@ -27,7 +33,42 @@ type findPullRequestsResult struct {
 	PullRequest *types.PullRequest
 }
 
+// `findPullRequestsCacheKey` returns cache key of `FindPullRequests`.
+func (s *service) findPullRequestsCacheKey(params types.FindPullRequestsParams) (string, error) {
+	key, err := json.Marshal(params)
+	if err != nil {
+		return "", err
+	}
+
+	return string(key), nil
+}
+
+// `findPullRequestsCacheValue` returns cached data of `FindPullRequests`.
+func (s *service) findPullRequestsCacheValue(data any) (*FindPullRequestsResult, error) {
+	d, ok := data.(string)
+	if !ok {
+		return nil, errors.New("unexpected type")
+	}
+
+	result := &FindPullRequestsResult{}
+	if err := json.Unmarshal([]byte(d), result); err != nil {
+		return result, nil
+	}
+
+	return result, nil
+}
+
 func (s *service) FindPullRequests(ctx context.Context, params types.FindPullRequestsParams) (*FindPullRequestsResult, error) {
+	key, err := s.findPullRequestsCacheKey(params)
+	if err != nil {
+		return nil, err
+	}
+
+	findPullRequestsCacheVal, found := s.cache.Get(key)
+	if found {
+		return s.findPullRequestsCacheValue(findPullRequestsCacheVal)
+	}
+
 	result := &FindPullRequestsResult{}
 
 	for _, pr := range params {
@@ -110,10 +151,11 @@ func (s *service) findPullRequests(ctx context.Context, param types.FindPullRequ
 	return result, nil
 }
 
-func NewService(HTTPClient *http.Client) (*service, error) {
+func NewService(cache *cachePkg.Cache, HTTPClient *http.Client) (*service, error) {
 	github := github.NewGitHub()
 
 	srv := &service{
+		cache:      cache,
 		HTTPClient: HTTPClient,
 		GitHub:     github,
 	}
