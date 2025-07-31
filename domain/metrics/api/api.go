@@ -18,6 +18,12 @@ type PullRequest struct {
 	// URL is the pull request url.
 	URL string
 
+	// Title is the pull request title.
+	Title string
+
+	// Body is the pull request body.
+	Body string
+
 	// Contributors are the pull request's contributors.
 	Contributors Contributors
 

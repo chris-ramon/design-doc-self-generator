@@ -162,6 +162,14 @@ var PullRequestType = graphql.NewObject(graphql.ObjectConfig{
 			Description: "The pull request url",
 			Type:        graphql.String,
 		},
+		"title": &graphql.Field{
+			Description: "The pull request title",
+			Type:        graphql.String,
+		},
+		"body": &graphql.Field{
+			Description: "The pull request body",
+			Type:        graphql.String,
+		},
 		"duration": &graphql.Field{
 			Description: "The duration of the pull request.",
 			Type:        DurationType,

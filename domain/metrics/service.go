@@ -232,6 +232,8 @@ func (s *service) FindAllPullRequests(ctx context.Context, params FindAllPullReq
 			Number:                int(prNode.Number),
 			Owner:                 owner,
 			Repo:                  repo,
+			Title:                 string(prNode.Title),
+			Body:                  string(prNode.Body),
 			Duration:              duration,
 			CreatedAt:             &prNode.CreatedAt.Time,
 			MergedAt:              &prNode.MergedAt.Time,

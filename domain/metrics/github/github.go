@@ -90,6 +90,8 @@ type AllPullRequestsNodes []AllPullRequestsNode
 type AllPullRequestsNode struct {
 	Number    githubv4.Int
 	URL       githubv4.String
+	Title     githubv4.String
+	Body      githubv4.String
 	CreatedAt githubv4.DateTime
 	MergedAt  githubv4.DateTime
 	HeadRef   struct {
