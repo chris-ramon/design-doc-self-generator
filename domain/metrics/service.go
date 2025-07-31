@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strconv"
 
 	githubClient "github.com/google/go-github/github"
@@ -345,9 +346,6 @@ func (s *service) GeneratePullRequestsGantt(ctx context.Context, params Generate
 		return nil, fmt.Errorf("failed to write DrawIO file: %w", err)
 	}
 
-	// Cache the file content as bytes
-	s.cache.Add(fileUUID, drawioContent)
-
 	result := &GeneratePullRequestsGanttResult{
 		UUID:     fileUUID,
 		FilePath: filePath,
@@ -359,8 +357,11 @@ func (s *service) GeneratePullRequestsGantt(ctx context.Context, params Generate
 }
 
 func (s *service) generateGanttDrawIOFromPullRequests(pullRequests []*types.PullRequest) ([]byte, error) {
-	// Read the default template
-	templatePath := filepath.Join("diagrams", "gantt", "default.drawio")
+	// Get the repository root directory using runtime.Caller
+	_, filename, _, _ := runtime.Caller(0)
+	repoRoot := filepath.Dir(filepath.Dir(filepath.Dir(filename)))
+	templatePath := filepath.Join(repoRoot, "diagrams", "gantt", "default.drawio")
+	
 	templateData, err := os.ReadFile(templatePath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read template file: %w", err)
@@ -386,8 +387,8 @@ func (s *service) generateGanttDrawIOFromPullRequests(pullRequests []*types.Pull
 		if cellIDInt, err := strconv.Atoi(cell.ID); err != nil {
 			// Keep non-numeric IDs (like diagram ID)
 			preservedCells = append(preservedCells, cell)
-		} else if cellIDInt < 63 || cellIDInt > 241 {
-			// Keep header cells (< 63) and calendar elements (> 241)
+		} else if cellIDInt < 63 {
+			// Keep only header cells (< 63), remove task rows (63-241) and timeline bars (242-278)
 			preservedCells = append(preservedCells, cell)
 			if cellIDInt > maxPreservedID {
 				maxPreservedID = cellIDInt
