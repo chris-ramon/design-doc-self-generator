@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"slices"
 
+	cachePkg "github.com/chris-ramon/golang-scaffolding/cache"
 	"github.com/chris-ramon/golang-scaffolding/config"
 	"github.com/chris-ramon/golang-scaffolding/db"
 	"github.com/chris-ramon/golang-scaffolding/domain/admin"
@@ -36,7 +37,7 @@ func main() {
 		log.Println("successfully run migrations")
 	}
 
-	router := http.NewServeMux()
+	cache := cachePkg.New()
 
 	usersRepo := users.NewRepo(db)
 	usersService := users.NewService(usersRepo)
@@ -64,7 +65,7 @@ func main() {
 	}
 
 	HTTPClient := &http.Client{}
-	metricsService, err := metrics.NewService(HTTPClient)
+	metricsService, err := metrics.NewService(cache, HTTPClient)
 	if err != nil {
 		handleErr(err)
 	}
@@ -88,6 +89,8 @@ func main() {
 		adminRoutes.All(),
 		usersRoutes.All(),
 	)
+
+	router := http.NewServeMux()
 
 	for _, r := range routes {
 		router.HandleFunc(fmt.Sprintf("%s %s", r.HTTPMethod, r.Path), r.Handler)
