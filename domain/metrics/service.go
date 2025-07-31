@@ -333,8 +333,10 @@ func (s *service) GeneratePullRequestsGantt(ctx context.Context, params Generate
 		return nil, err
 	}
 
-	// Create the file path
-	filePath := filepath.Join("diagrams", "gantt", fileUUID+".drawio")
+	// Create the file path using the same repoRoot approach
+	_, filename, _, _ := runtime.Caller(0)
+	repoRoot := filepath.Dir(filepath.Dir(filepath.Dir(filename)))
+	filePath := filepath.Join(repoRoot, "diagrams", "gantt", fileUUID+".drawio")
 
 	// Ensure the directory exists
 	if err := os.MkdirAll(filepath.Dir(filePath), 0755); err != nil {
