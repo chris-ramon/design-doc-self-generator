@@ -2,8 +2,6 @@
 
 Self-generates design docs.
 
-## Getting Started
-
 ## Running
 1. Copy `.env.example` to `.env`
 
@@ -20,7 +18,6 @@ docker compose up
 
 ### Examples
 
-#### Examples
 Obtaining pull request data from GitHub by URLs:
 
 ```graphql
@@ -83,7 +80,7 @@ Test output:
 ## Features
 
 Contains the following features:
-- [x] Pulls GitHub Data.
+- [x] Data from GitHub.
 - [x] Env Variables.
 - [x] Config.
 - [x] Auth.
