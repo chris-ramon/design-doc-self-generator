@@ -84,6 +84,20 @@ var InformationType = graphql.NewObject(graphql.ObjectConfig{
 	},
 })
 
+var GanttResultType = graphql.NewObject(graphql.ObjectConfig{
+	Name: "GanttResultType",
+	Fields: graphql.Fields{
+		"uuid": &graphql.Field{
+			Description: "The UUID of the generated Gantt file.",
+			Type:        graphql.String,
+		},
+		"filePath": &graphql.Field{
+			Description: "The file path of the generated Gantt file.",
+			Type:        graphql.String,
+		},
+	},
+})
+
 var GitHubType = graphql.NewObject(graphql.ObjectConfig{
 	Name: "GitHubType",
 	Fields: graphql.Fields{
@@ -246,16 +260,3 @@ var ContributorType = graphql.NewObject(graphql.ObjectConfig{
 	},
 })
 
-var GanttResultType = graphql.NewObject(graphql.ObjectConfig{
-	Name: "GanttResultType",
-	Fields: graphql.Fields{
-		"uuid": &graphql.Field{
-			Description: "The UUID of the generated Gantt file.",
-			Type:        graphql.String,
-		},
-		"filePath": &graphql.Field{
-			Description: "The file path of the generated Gantt file.",
-			Type:        graphql.String,
-		},
-	},
-})

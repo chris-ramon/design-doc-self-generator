@@ -413,7 +413,7 @@ func (s *service) generateGanttDrawIOFromPullRequests(pullRequests []*types.Pull
 		}
 
 		y := startY + i*rowHeight
-		baseID := nextID + i*5 // Each PR uses 5 cells, avoid ID collisions
+		baseID := nextID // Use current nextID for this PR
 
 		// Task number cell
 		numberCell := gantt.MxCell{
@@ -508,6 +508,9 @@ func (s *service) generateGanttDrawIOFromPullRequests(pullRequests []*types.Pull
 		// Add all cells to the diagram
 		diagram.MxGraphModel.Root.Cells = append(diagram.MxGraphModel.Root.Cells,
 			numberCell, nameCell, durationCell, startDateCell, endDateCell)
+		
+		// Increment nextID by 5 for the next PR
+		nextID += 5
 	}
 
 	// Marshal back to XML
