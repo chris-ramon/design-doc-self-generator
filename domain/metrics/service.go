@@ -447,32 +447,28 @@ func (s *service) generateGanttDrawIOFromPullRequests(pullRequests []*types.Pull
 	}
 	diagram.MxGraphModel.Root.Cells = preservedCells
 
-	prNumberCell := gantt.MxCell{}
-	taskNameCell := gantt.MxCell{}
-	contributorsCell := gantt.MxCell{}
-	durationCell := gantt.MxCell{}
-	startAtCell := gantt.MxCell{}
-	mergedAtCell := gantt.MxCell{}
+	templatePrNumberCell := gantt.MxCell{}
+	templateTaskNameCell := gantt.MxCell{}
+	templateParticipantsCell := gantt.MxCell{}
+	templateDurationCell := gantt.MxCell{}
+	templateStartAtCell := gantt.MxCell{}
+	templateMergedAtCell := gantt.MxCell{}
 
 	for _, cell := range preservedCells {
 		if cell.MxGeometry != nil {
-			if cell.Value == "PR #" {
-				prNumberCell = cell
-			}
-			if cell.Value == "Task Name" {
-				taskNameCell = cell
-			}
-			if cell.Value == "Participants" {
-				contributorsCell = cell
-			}
-			if cell.Value == "Duration" {
-				durationCell = cell
-			}
-			if cell.Value == "Created At" {
-				startAtCell = cell
-			}
-			if cell.Value == "Merged At" {
-				mergedAtCell = cell
+			switch cell.Value {
+			case "PR #":
+				templatePrNumberCell = cell
+			case "Task Name":
+				templateTaskNameCell = cell
+			case "Participants":
+				templateParticipantsCell = cell
+			case "Duration":
+				templateDurationCell = cell
+			case "Created At":
+				templateStartAtCell = cell
+			case "Merged At":
+				templateMergedAtCell = cell
 			}
 		}
 	}
@@ -504,7 +500,7 @@ func (s *service) generateGanttDrawIOFromPullRequests(pullRequests []*types.Pull
 			Parent: "1",
 			Vertex: "1",
 			MxGeometry: &gantt.MxGeometry{
-				X:      prNumberCell.MxGeometry.X,
+				X:      templatePrNumberCell.MxGeometry.X,
 				Y:      yStr,
 				Width:  "50",
 				Height: "20",
@@ -520,9 +516,9 @@ func (s *service) generateGanttDrawIOFromPullRequests(pullRequests []*types.Pull
 			Parent: "1",
 			Vertex: "1",
 			MxGeometry: &gantt.MxGeometry{
-				X:      taskNameCell.MxGeometry.X,
+				X:      templateTaskNameCell.MxGeometry.X,
 				Y:      yStr,
-				Width:  taskNameCell.MxGeometry.Width,
+				Width:  templateTaskNameCell.MxGeometry.Width,
 				Height: "20",
 				As:     "geometry",
 			},
@@ -536,9 +532,9 @@ func (s *service) generateGanttDrawIOFromPullRequests(pullRequests []*types.Pull
 			Parent: "1",
 			Vertex: "1",
 			MxGeometry: &gantt.MxGeometry{
-				X:      contributorsCell.MxGeometry.X,
+				X:      templateParticipantsCell.MxGeometry.X,
 				Y:      yStr,
-				Width:  contributorsCell.MxGeometry.Width,
+				Width:  templateParticipantsCell.MxGeometry.Width,
 				Height: "20",
 				As:     "geometry",
 			},
@@ -562,9 +558,9 @@ func (s *service) generateGanttDrawIOFromPullRequests(pullRequests []*types.Pull
 			Parent: "1",
 			Vertex: "1",
 			MxGeometry: &gantt.MxGeometry{
-				X:      durationCell.MxGeometry.X,
+				X:      templateDurationCell.MxGeometry.X,
 				Y:      yStr,
-				Width:  durationCell.MxGeometry.Width,
+				Width:  templateDurationCell.MxGeometry.Width,
 				Height: "20",
 				As:     "geometry",
 			},
@@ -578,9 +574,9 @@ func (s *service) generateGanttDrawIOFromPullRequests(pullRequests []*types.Pull
 			Parent: "1",
 			Vertex: "1",
 			MxGeometry: &gantt.MxGeometry{
-				X:      startAtCell.MxGeometry.X,
+				X:      templateStartAtCell.MxGeometry.X,
 				Y:      yStr,
-				Width:  startAtCell.MxGeometry.Width,
+				Width:  templateStartAtCell.MxGeometry.Width,
 				Height: "20",
 				As:     "geometry",
 			},
@@ -594,9 +590,9 @@ func (s *service) generateGanttDrawIOFromPullRequests(pullRequests []*types.Pull
 			Parent: "1",
 			Vertex: "1",
 			MxGeometry: &gantt.MxGeometry{
-				X:      mergedAtCell.MxGeometry.X,
+				X:      templateMergedAtCell.MxGeometry.X,
 				Y:      yStr,
-				Width:  mergedAtCell.MxGeometry.Width,
+				Width:  templateMergedAtCell.MxGeometry.Width,
 				Height: "20",
 				As:     "geometry",
 			},
