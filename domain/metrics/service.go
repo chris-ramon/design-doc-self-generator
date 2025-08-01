@@ -168,7 +168,7 @@ func (s *service) findPullRequests(ctx context.Context, param types.FindPullRequ
 	}
 
 	// Extract pull request metrics.
-	duration := pullRequest.MergedAt.Sub(*pullRequest.CreatedAt)
+	duration := pullRequest.MergedAt.UTC().Sub(pullRequest.CreatedAt.UTC())
 
 	var title, body string
 	if pullRequest.Title != nil {
@@ -265,7 +265,9 @@ func (s *service) FindAllPullRequests(ctx context.Context, params FindAllPullReq
 			contributors = append(contributors, c)
 		}
 
-		duration := prNode.MergedAt.Time.Sub(prNode.CreatedAt.Time)
+		duration := prNode.MergedAt.UTC().Sub(prNode.CreatedAt.UTC())
+		createdAt := prNode.CreatedAt.UTC()
+		mergedAt := prNode.MergedAt.UTC()
 		pr := &types.PullRequest{
 			Number:                int(prNode.Number),
 			Owner:                 owner,
@@ -273,8 +275,8 @@ func (s *service) FindAllPullRequests(ctx context.Context, params FindAllPullReq
 			Title:                 string(prNode.Title),
 			Body:                  string(prNode.Body),
 			Duration:              duration,
-			CreatedAt:             &prNode.CreatedAt.Time,
-			MergedAt:              &prNode.MergedAt.Time,
+			CreatedAt:             &createdAt,
+			MergedAt:              &mergedAt,
 			URL:                   string(prNode.URL),
 			Contributors:          contributors,
 			HeadRefName:           string(prNode.HeadRef.Name),
@@ -543,7 +545,7 @@ func (s *service) generateGanttDrawIOFromPullRequests(pullRequests []*types.Pull
 		}
 
 		// Duration cell
-		duration := pr.MergedAt.Sub(*pr.CreatedAt)
+		duration := pr.MergedAt.UTC().Sub(pr.CreatedAt.UTC())
 		durationDays := int(duration.Hours() / 24)
 		if durationDays == 0 {
 			durationDays = 1
@@ -571,7 +573,7 @@ func (s *service) generateGanttDrawIOFromPullRequests(pullRequests []*types.Pull
 		// Start date cell
 		startDateCell := gantt.MxCell{
 			ID:     strconv.Itoa(baseID + 4),
-			Value:  pr.CreatedAt.Format("02.01.06"),
+			Value:  pr.CreatedAt.UTC().Format("02.01.06"),
 			Style:  "strokeColor=#DEEDFF;fillColor=#ADC3D9",
 			Parent: "1",
 			Vertex: "1",
@@ -587,7 +589,7 @@ func (s *service) generateGanttDrawIOFromPullRequests(pullRequests []*types.Pull
 		// End date cell
 		endDateCell := gantt.MxCell{
 			ID:     strconv.Itoa(baseID + 5),
-			Value:  pr.MergedAt.Format("02.01.06"),
+			Value:  pr.MergedAt.UTC().Format("02.01.06"),
 			Style:  "strokeColor=#DEEDFF;fillColor=#ADC3D9",
 			Parent: "1",
 			Vertex: "1",
