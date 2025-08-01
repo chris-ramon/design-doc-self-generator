@@ -47,6 +47,12 @@ type PullRequest struct {
 
 // Contributor represents the pull request contributor.
 type Contributor struct {
+	// ID is the contributor ID.
+	ID string
+
+	// Login is the contributor login.
+	Login string
+
 	// ProfileURL is the contributor profile URL.
 	ProfileURL string
 }
@@ -54,15 +60,41 @@ type Contributor struct {
 // Contributors represents slice of Contributors.
 type Contributors []Contributor
 
-func (c *Contributors) FormattedContributors() string {
-	result := []string{}
+type FormatContributorType uint8
 
-	for _, contributor := range *c {
-		formattedProfileURL := fmt.Sprintf("- %s", contributor.ProfileURL)
-		result = append(result, formattedProfileURL)
+const (
+	DefaultFormatContributorType = iota
+	CommasFormatContributorType
+)
+
+func (c *Contributors) FormattedContributors(formatContributorType FormatContributorType) string {
+	formattedByCommas := func() string {
+		result := []string{}
+
+		for _, contributor := range *c {
+			result = append(result, contributor.Login)
+		}
+
+		return strings.Join(result, ", ")
 	}
 
-	return strings.Join(result, "</br>")
+	formattedForHTML := func() string {
+		result := []string{}
+
+		for _, contributor := range *c {
+			formattedProfileURL := fmt.Sprintf("- %s", contributor.ProfileURL)
+			result = append(result, formattedProfileURL)
+		}
+
+		return strings.Join(result, "</br>")
+	}
+
+	switch formatContributorType {
+	case CommasFormatContributorType:
+		return formattedByCommas()
+	default:
+		return formattedForHTML()
+	}
 }
 
 // FormattedIntervalDates formats and returns the created at and merged at dates.

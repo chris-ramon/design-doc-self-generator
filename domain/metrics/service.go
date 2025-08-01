@@ -10,6 +10,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"slices"
 	"strconv"
 
 	githubClient "github.com/google/go-github/github"
@@ -159,14 +160,16 @@ func (s *service) findPullRequests(ctx context.Context, param types.FindPullRequ
 		for _, participant := range prNode.Participants.Nodes {
 			c := types.Contributor{
 				ProfileURL: string(participant.URL),
+				ID:         string(participant.ID),
+				Login:      string(participant.Login),
 			}
 			contributors = append(contributors, c)
 		}
 	}
 
 	// Extract pull request metrics.
-	duration := pullRequest.MergedAt.Sub(*pullRequest.CreatedAt)
-	
+	duration := pullRequest.MergedAt.UTC().Sub(pullRequest.CreatedAt.UTC())
+
 	var title, body string
 	if pullRequest.Title != nil {
 		title = *pullRequest.Title
@@ -174,7 +177,7 @@ func (s *service) findPullRequests(ctx context.Context, param types.FindPullRequ
 	if pullRequest.Body != nil {
 		body = *pullRequest.Body
 	}
-	
+
 	pr := &types.PullRequest{
 		Duration:              duration,
 		CreatedAt:             pullRequest.CreatedAt,
@@ -183,7 +186,7 @@ func (s *service) findPullRequests(ctx context.Context, param types.FindPullRequ
 		Title:                 title,
 		Body:                  body,
 		Contributors:          contributors,
-		FormattedContributors: contributors.FormattedContributors(),
+		FormattedContributors: contributors.FormattedContributors(types.DefaultFormatContributorType),
 	}
 
 	// Create the result.
@@ -256,11 +259,15 @@ func (s *service) FindAllPullRequests(ctx context.Context, params FindAllPullReq
 		for _, participant := range prNode.Participants.Nodes {
 			c := types.Contributor{
 				ProfileURL: string(participant.URL),
+				ID:         string(participant.ID),
+				Login:      string(participant.Login),
 			}
 			contributors = append(contributors, c)
 		}
 
-		duration := prNode.MergedAt.Time.Sub(prNode.CreatedAt.Time)
+		duration := prNode.MergedAt.UTC().Sub(prNode.CreatedAt.UTC())
+		createdAt := prNode.CreatedAt.UTC()
+		mergedAt := prNode.MergedAt.UTC()
 		pr := &types.PullRequest{
 			Number:                int(prNode.Number),
 			Owner:                 owner,
@@ -268,12 +275,12 @@ func (s *service) FindAllPullRequests(ctx context.Context, params FindAllPullReq
 			Title:                 string(prNode.Title),
 			Body:                  string(prNode.Body),
 			Duration:              duration,
-			CreatedAt:             &prNode.CreatedAt.Time,
-			MergedAt:              &prNode.MergedAt.Time,
+			CreatedAt:             &createdAt,
+			MergedAt:              &mergedAt,
 			URL:                   string(prNode.URL),
 			Contributors:          contributors,
 			HeadRefName:           string(prNode.HeadRef.Name),
-			FormattedContributors: contributors.FormattedContributors(),
+			FormattedContributors: contributors.FormattedContributors(types.CommasFormatContributorType),
 		}
 
 		result.PullRequests = append(result.PullRequests, pr)
@@ -331,7 +338,8 @@ func (s *service) GeneratePullRequestsGantt(ctx context.Context, params Generate
 	}
 
 	pullRequests := findAllPullRequestsResult.PullRequests
-	
+	pullRequests = s.sortPullRequestsAsc(pullRequests)
+
 	// Extract repository name for directory structure
 	owner, repo, err := github.RepositoryFromURL(params.RepositoryURL)
 	if err != nil {
@@ -342,7 +350,7 @@ func (s *service) GeneratePullRequestsGantt(ctx context.Context, params Generate
 	// Create the base directory path
 	_, filename, _, _ := runtime.Caller(0)
 	repoRoot := filepath.Dir(filepath.Dir(filepath.Dir(filename)))
-	baseDir := filepath.Join(repoRoot, "diagrams", "gantt", repoName)
+	baseDir := filepath.Join(repoRoot, "diagrams", "gantt", "generated", repoName)
 
 	// Ensure the directory exists
 	if err := os.MkdirAll(baseDir, 0755); err != nil {
@@ -361,26 +369,26 @@ func (s *service) GeneratePullRequestsGantt(ctx context.Context, params Generate
 		if end > len(pullRequests) {
 			end = len(pullRequests)
 		}
-		
+
 		chunk := pullRequests[i:end]
-		
+
 		// Generate UUID for this part
 		fileUUID := uuid.New().String()
-		
+
 		// Generate the Gantt DrawIO file for this chunk
 		drawioContent, err := s.generateGanttDrawIOFromPullRequests(chunk)
 		if err != nil {
 			return nil, fmt.Errorf("failed to generate Gantt for chunk %d: %w", i/limit+1, err)
 		}
-		
+
 		// Create the file path
 		filePath := filepath.Join(baseDir, fileUUID+".drawio")
-		
+
 		// Write the file
 		if err := os.WriteFile(filePath, drawioContent, 0644); err != nil {
 			return nil, fmt.Errorf("failed to write DrawIO file: %w", err)
 		}
-		
+
 		parts = append(parts, GeneratePullRequestsGanttPart{
 			Limit:    len(chunk),
 			UUID:     fileUUID,
@@ -402,7 +410,7 @@ func (s *service) generateGanttDrawIOFromPullRequests(pullRequests []*types.Pull
 	_, filename, _, _ := runtime.Caller(0)
 	repoRoot := filepath.Dir(filepath.Dir(filepath.Dir(filename)))
 	templatePath := filepath.Join(repoRoot, "diagrams", "gantt", "default.drawio")
-	
+
 	templateData, err := os.ReadFile(templatePath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read template file: %w", err)
@@ -422,7 +430,7 @@ func (s *service) generateGanttDrawIOFromPullRequests(pullRequests []*types.Pull
 	diagram := &mxFile.Diagrams[0]
 	preservedCells := []gantt.MxCell{}
 	maxPreservedID := 0
-	
+
 	for _, cell := range diagram.MxGraphModel.Root.Cells {
 		// Parse cell ID as integer to check if it's a task row
 		if cellIDInt, err := strconv.Atoi(cell.ID); err != nil {
@@ -439,16 +447,42 @@ func (s *service) generateGanttDrawIOFromPullRequests(pullRequests []*types.Pull
 	}
 	diagram.MxGraphModel.Root.Cells = preservedCells
 
+	templatePrNumberCell := gantt.MxCell{}
+	templateTaskNameCell := gantt.MxCell{}
+	templateParticipantsCell := gantt.MxCell{}
+	templateDurationCell := gantt.MxCell{}
+	templateStartAtCell := gantt.MxCell{}
+	templateMergedAtCell := gantt.MxCell{}
+
+	for _, cell := range preservedCells {
+		if cell.MxGeometry != nil {
+			switch cell.Value {
+			case "PR #":
+				templatePrNumberCell = cell
+			case "Task Name":
+				templateTaskNameCell = cell
+			case "Participants":
+				templateParticipantsCell = cell
+			case "Duration":
+				templateDurationCell = cell
+			case "Created At":
+				templateStartAtCell = cell
+			case "Merged At":
+				templateMergedAtCell = cell
+			}
+		}
+	}
+
 	// Generate cells for pull requests
 	startY := 380
 	rowHeight := 20
-	
+
 	// Start new IDs after the highest preserved ID to avoid collisions
 	nextID := maxPreservedID + 1
 	if nextID < 63 {
 		nextID = 63 // Ensure we start at least at 63 for task rows
 	}
-	
+
 	for i, pr := range pullRequests {
 		if pr.CreatedAt == nil || pr.MergedAt == nil {
 			continue
@@ -466,7 +500,7 @@ func (s *service) generateGanttDrawIOFromPullRequests(pullRequests []*types.Pull
 			Parent: "1",
 			Vertex: "1",
 			MxGeometry: &gantt.MxGeometry{
-				X:      "86.5",
+				X:      templatePrNumberCell.MxGeometry.X,
 				Y:      yStr,
 				Width:  "50",
 				Height: "20",
@@ -482,9 +516,9 @@ func (s *service) generateGanttDrawIOFromPullRequests(pullRequests []*types.Pull
 			Parent: "1",
 			Vertex: "1",
 			MxGeometry: &gantt.MxGeometry{
-				X:      "136.5",
+				X:      templateTaskNameCell.MxGeometry.X,
 				Y:      yStr,
-				Width:  "220",
+				Width:  templateTaskNameCell.MxGeometry.Width,
 				Height: "20",
 				As:     "geometry",
 			},
@@ -498,16 +532,16 @@ func (s *service) generateGanttDrawIOFromPullRequests(pullRequests []*types.Pull
 			Parent: "1",
 			Vertex: "1",
 			MxGeometry: &gantt.MxGeometry{
-				X:      "356.5",
+				X:      templateParticipantsCell.MxGeometry.X,
 				Y:      yStr,
-				Width:  "100",
+				Width:  templateParticipantsCell.MxGeometry.Width,
 				Height: "20",
 				As:     "geometry",
 			},
 		}
 
 		// Duration cell
-		duration := pr.MergedAt.Sub(*pr.CreatedAt)
+		duration := pr.MergedAt.UTC().Sub(pr.CreatedAt.UTC())
 		durationDays := int(duration.Hours() / 24)
 		if durationDays == 0 {
 			durationDays = 1
@@ -524,9 +558,9 @@ func (s *service) generateGanttDrawIOFromPullRequests(pullRequests []*types.Pull
 			Parent: "1",
 			Vertex: "1",
 			MxGeometry: &gantt.MxGeometry{
-				X:      "456.5",
+				X:      templateDurationCell.MxGeometry.X,
 				Y:      yStr,
-				Width:  "70",
+				Width:  templateDurationCell.MxGeometry.Width,
 				Height: "20",
 				As:     "geometry",
 			},
@@ -535,14 +569,14 @@ func (s *service) generateGanttDrawIOFromPullRequests(pullRequests []*types.Pull
 		// Start date cell
 		startDateCell := gantt.MxCell{
 			ID:     strconv.Itoa(baseID + 4),
-			Value:  pr.CreatedAt.Format("02.01.06"),
+			Value:  pr.CreatedAt.UTC().Format("02.01.06"),
 			Style:  "strokeColor=#DEEDFF;fillColor=#ADC3D9",
 			Parent: "1",
 			Vertex: "1",
 			MxGeometry: &gantt.MxGeometry{
-				X:      "526.5",
+				X:      templateStartAtCell.MxGeometry.X,
 				Y:      yStr,
-				Width:  "80",
+				Width:  templateStartAtCell.MxGeometry.Width,
 				Height: "20",
 				As:     "geometry",
 			},
@@ -551,14 +585,14 @@ func (s *service) generateGanttDrawIOFromPullRequests(pullRequests []*types.Pull
 		// End date cell
 		endDateCell := gantt.MxCell{
 			ID:     strconv.Itoa(baseID + 5),
-			Value:  pr.MergedAt.Format("02.01.06"),
+			Value:  pr.MergedAt.UTC().Format("02.01.06"),
 			Style:  "strokeColor=#DEEDFF;fillColor=#ADC3D9",
 			Parent: "1",
 			Vertex: "1",
 			MxGeometry: &gantt.MxGeometry{
-				X:      "606.5",
+				X:      templateMergedAtCell.MxGeometry.X,
 				Y:      yStr,
-				Width:  "80",
+				Width:  templateMergedAtCell.MxGeometry.Width,
 				Height: "20",
 				As:     "geometry",
 			},
@@ -567,7 +601,7 @@ func (s *service) generateGanttDrawIOFromPullRequests(pullRequests []*types.Pull
 		// Add all cells to the diagram
 		diagram.MxGraphModel.Root.Cells = append(diagram.MxGraphModel.Root.Cells,
 			numberCell, nameCell, contributorsCell, durationCell, startDateCell, endDateCell)
-		
+
 		// Increment nextID by 6 for the next PR
 		nextID += 6
 	}
@@ -581,6 +615,33 @@ func (s *service) generateGanttDrawIOFromPullRequests(pullRequests []*types.Pull
 	// Add XML declaration
 	xmlDeclaration := []byte(`<?xml version="1.0" encoding="UTF-8"?>` + "\n")
 	return append(xmlDeclaration, output...), nil
+}
+
+// sortPullRequests sorts given pull requests by given
+func (s *service) sortPullRequestsAsc(p []*types.PullRequest) []*types.PullRequest {
+	prs := []types.PullRequest{}
+
+	for _, pr := range p {
+		prs = append(prs, *pr)
+	}
+
+	slices.SortFunc(prs, func(a, b types.PullRequest) int {
+		if a.Number > b.Number {
+			return 1
+		}
+		if a.Number < b.Number {
+			return -1
+		}
+		return 0
+	})
+
+	result := []*types.PullRequest{}
+
+	for _, pr := range prs {
+		result = append(result, &pr)
+	}
+
+	return result
 }
 
 func NewService(cache *cachePkg.Cache, HTTPClient *http.Client) (*service, error) {
