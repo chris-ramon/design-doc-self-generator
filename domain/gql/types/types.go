@@ -138,11 +138,8 @@ var GitHubType = graphql.NewObject(graphql.ObjectConfig{
 					return nil, fmt.Errorf("repository URL is required")
 				}
 
-				// Get the limit parameter
-				limit, ok := p.Args["limit"].(int)
-				if !ok {
-					limit = 25 // Default value
-				}
+				// Get the limit parameter (GraphQL guarantees default value is applied)
+				limit := p.Args["limit"].(int)
 
 				params := metrics.GeneratePullRequestsGanttParams{
 					RepositoryURL: repoURL.(string),
