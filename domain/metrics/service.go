@@ -456,7 +456,7 @@ func (s *service) generateGanttDrawIOFromPullRequests(pullRequests []*types.Pull
 			if cell.Value == "Task Name" {
 				taskNameCell = cell
 			}
-			if cell.Value == "Contributors" {
+			if cell.Value == "Participants" {
 				contributorsCell = cell
 			}
 			if cell.Value == "Duration" {
