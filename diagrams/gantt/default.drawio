@@ -542,10 +542,10 @@
           <mxGeometry x="1646.5000000000018" y="380.0000000000366" width="20" height="520" as="geometry" />
         </mxCell>
         <mxCell id="2" value="Task Name" style="fillColor=#23445D;strokeColor=#FFFFFF;strokeWidth=2;fontColor=#FFFFFF;fontStyle=1" parent="1" vertex="1">
-          <mxGeometry x="146.5" y="340" width="250" height="40" as="geometry" />
+          <mxGeometry x="136.5" y="340" width="220" height="40" as="geometry" />
         </mxCell>
         <mxCell id="3" value="PR #" style="fillColor=#23445D;strokeColor=#FFFFFF;strokeWidth=2;fontColor=#FFFFFF;fontStyle=1" parent="1" vertex="1">
-          <mxGeometry x="86.5" y="340" width="60" height="40" as="geometry" />
+          <mxGeometry x="86.5" y="340" width="50" height="40" as="geometry" />
         </mxCell>
         <mxCell id="4" value="16 Apr 12" style="fillColor=#23445D;strokeColor=#FFFFFF;strokeWidth=2;fontColor=#FFFFFF;fontStyle=1" parent="1" vertex="1">
           <mxGeometry x="686.5000000000018" y="340.0000000000001" width="140" height="20" as="geometry" />
@@ -572,16 +572,16 @@
           <mxGeometry x="806.5000000000016" y="360.0000000000001" width="20" height="20" as="geometry" />
         </mxCell>
         <mxCell id="contributors" value="Contributors" style="fillColor=#23445D;strokeColor=#FFFFFF;strokeWidth=2;fontColor=#FFFFFF;fontStyle=1" parent="1" vertex="1">
-          <mxGeometry x="396.5" y="340" width="120" height="40" as="geometry" />
+          <mxGeometry x="356.5" y="340" width="100" height="40" as="geometry" />
         </mxCell>
         <mxCell id="12" value="Duration" style="fillColor=#23445D;strokeColor=#FFFFFF;strokeWidth=2;fontColor=#FFFFFF;fontStyle=1" parent="1" vertex="1">
-          <mxGeometry x="516.5" y="340" width="80" height="40" as="geometry" />
+          <mxGeometry x="456.5" y="340" width="70" height="40" as="geometry" />
         </mxCell>
         <mxCell id="13" value="Start" style="fillColor=#23445D;strokeColor=#FFFFFF;strokeWidth=2;fontColor=#FFFFFF;fontStyle=1" parent="1" vertex="1">
-          <mxGeometry x="596.5" y="340" width="80" height="40" as="geometry" />
+          <mxGeometry x="526.5" y="340" width="80" height="40" as="geometry" />
         </mxCell>
         <mxCell id="14" value="ETA" style="fillColor=#23445D;strokeColor=#FFFFFF;strokeWidth=2;fontColor=#FFFFFF;fontStyle=1" parent="1" vertex="1">
-          <mxGeometry x="676.5" y="340" width="80" height="40" as="geometry" />
+          <mxGeometry x="606.5" y="340" width="80" height="40" as="geometry" />
         </mxCell>
         <mxCell id="15" value="23 Apr 12" style="fillColor=#23445D;strokeColor=#FFFFFF;strokeWidth=2;fontColor=#FFFFFF;fontStyle=1" parent="1" vertex="1">
           <mxGeometry x="826.5000000000018" y="340.0000000000001" width="140" height="20" as="geometry" />
