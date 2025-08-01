@@ -53,8 +53,9 @@ type Participants struct {
 }
 
 type ParticipantsNode struct {
-	URL githubv4.String
-	ID  githubv4.String
+	URL   githubv4.String
+	ID    githubv4.String
+	Login githubv4.String
 }
 
 type ParticipantsNodes []ParticipantsNode
