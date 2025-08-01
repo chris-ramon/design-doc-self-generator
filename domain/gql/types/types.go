@@ -8,6 +8,7 @@ import (
 
 	"github.com/chris-ramon/golang-scaffolding/domain/gql/util"
 	"github.com/chris-ramon/golang-scaffolding/domain/metrics"
+	"github.com/chris-ramon/golang-scaffolding/domain/metrics/api"
 	"github.com/chris-ramon/golang-scaffolding/domain/metrics/github"
 	"github.com/chris-ramon/golang-scaffolding/domain/metrics/mappers"
 )
@@ -235,8 +236,13 @@ var PullRequestType = graphql.NewObject(graphql.ObjectConfig{
 			Description: "The pull request number with # prefix",
 			Type:        graphql.String,
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-				if pr, ok := p.Source.(map[string]interface{}); ok {
-					if number, exists := pr["Number"]; exists {
+				switch v := p.Source.(type) {
+				case api.PullRequest:
+					return fmt.Sprintf("#%d", v.Number), nil
+				case *api.PullRequest:
+					return fmt.Sprintf("#%d", v.Number), nil
+				case map[string]interface{}:
+					if number, exists := v["Number"]; exists {
 						return fmt.Sprintf("#%d", number), nil
 					}
 				}
@@ -247,8 +253,17 @@ var PullRequestType = graphql.NewObject(graphql.ObjectConfig{
 			Description: "The pull request created at date in Day.Month.Year format",
 			Type:        graphql.String,
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-				if pr, ok := p.Source.(map[string]interface{}); ok {
-					if createdAt, exists := pr["CreatedAt"]; exists && createdAt != nil {
+				switch v := p.Source.(type) {
+				case api.PullRequest:
+					if v.CreatedAt != nil {
+						return v.CreatedAt.Format("2.1.2006"), nil
+					}
+				case *api.PullRequest:
+					if v.CreatedAt != nil {
+						return v.CreatedAt.Format("2.1.2006"), nil
+					}
+				case map[string]interface{}:
+					if createdAt, exists := v["CreatedAt"]; exists && createdAt != nil {
 						if t, ok := createdAt.(*time.Time); ok && t != nil {
 							return t.Format("2.1.2006"), nil
 						}
@@ -261,8 +276,17 @@ var PullRequestType = graphql.NewObject(graphql.ObjectConfig{
 			Description: "The pull request merged at date in Day.Month.Year format",
 			Type:        graphql.String,
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-				if pr, ok := p.Source.(map[string]interface{}); ok {
-					if mergedAt, exists := pr["MergedAt"]; exists && mergedAt != nil {
+				switch v := p.Source.(type) {
+				case api.PullRequest:
+					if v.MergedAt != nil {
+						return v.MergedAt.Format("2.1.2006"), nil
+					}
+				case *api.PullRequest:
+					if v.MergedAt != nil {
+						return v.MergedAt.Format("2.1.2006"), nil
+					}
+				case map[string]interface{}:
+					if mergedAt, exists := v["MergedAt"]; exists && mergedAt != nil {
 						if t, ok := mergedAt.(*time.Time); ok && t != nil {
 							return t.Format("2.1.2006"), nil
 						}
