@@ -382,7 +382,7 @@ func (s *service) GeneratePullRequestsGantt(ctx context.Context, params Generate
 		}
 		
 		parts = append(parts, GeneratePullRequestsGanttPart{
-			Limit:    limit,
+			Limit:    len(chunk),
 			UUID:     fileUUID,
 			FilePath: filePath,
 		})

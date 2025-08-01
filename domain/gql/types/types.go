@@ -88,7 +88,7 @@ var GanttResultType = graphql.NewObject(graphql.ObjectConfig{
 	Name: "GanttResultType",
 	Fields: graphql.Fields{
 		"limit": &graphql.Field{
-			Description: "The limit parameter used for the Gantt generation.",
+			Description: "The number of pull requests included in this Gantt part.",
 			Type:        graphql.Int,
 		},
 		"uuid": &graphql.Field{

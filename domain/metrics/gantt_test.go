@@ -119,8 +119,8 @@ func TestGeneratePullRequestsGanttIntegration(t *testing.T) {
 	}
 
 	firstPart := result.Parts[0]
-	if firstPart.Limit != 5 {
-		t.Errorf("Expected Limit to be 5, got %d", firstPart.Limit)
+	if firstPart.Limit <= 0 || firstPart.Limit > 5 {
+		t.Errorf("Expected Limit to be between 1 and 5, got %d", firstPart.Limit)
 	}
 
 	if firstPart.UUID == "" {
