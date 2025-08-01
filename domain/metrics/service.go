@@ -160,6 +160,7 @@ func (s *service) findPullRequests(ctx context.Context, param types.FindPullRequ
 		for _, participant := range prNode.Participants.Nodes {
 			c := types.Contributor{
 				ProfileURL: string(participant.URL),
+				ID:         string(participant.ID),
 			}
 			contributors = append(contributors, c)
 		}
@@ -184,7 +185,7 @@ func (s *service) findPullRequests(ctx context.Context, param types.FindPullRequ
 		Title:                 title,
 		Body:                  body,
 		Contributors:          contributors,
-		FormattedContributors: contributors.FormattedContributors(),
+		FormattedContributors: contributors.FormattedContributors(types.DefaultFormatContributorType),
 	}
 
 	// Create the result.
@@ -257,6 +258,7 @@ func (s *service) FindAllPullRequests(ctx context.Context, params FindAllPullReq
 		for _, participant := range prNode.Participants.Nodes {
 			c := types.Contributor{
 				ProfileURL: string(participant.URL),
+				ID:         string(participant.ID),
 			}
 			contributors = append(contributors, c)
 		}
@@ -274,7 +276,7 @@ func (s *service) FindAllPullRequests(ctx context.Context, params FindAllPullReq
 			URL:                   string(prNode.URL),
 			Contributors:          contributors,
 			HeadRefName:           string(prNode.HeadRef.Name),
-			FormattedContributors: contributors.FormattedContributors(),
+			FormattedContributors: contributors.FormattedContributors(types.CommasFormatContributorType),
 		}
 
 		result.PullRequests = append(result.PullRequests, pr)
