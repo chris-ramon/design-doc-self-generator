@@ -87,6 +87,10 @@ var InformationType = graphql.NewObject(graphql.ObjectConfig{
 var GanttResultType = graphql.NewObject(graphql.ObjectConfig{
 	Name: "GanttResultType",
 	Fields: graphql.Fields{
+		"limit": &graphql.Field{
+			Description: "The limit parameter used for the Gantt generation.",
+			Type:        graphql.Int,
+		},
 		"uuid": &graphql.Field{
 			Description: "The UUID of the generated Gantt file.",
 			Type:        graphql.String,
@@ -108,9 +112,15 @@ var GitHubType = graphql.NewObject(graphql.ObjectConfig{
 				return p.Source, nil
 			},
 		},
-		"generatePullRequestsGantt": &graphql.Field{
+		"gantt": &graphql.Field{
 			Description: "Generate a Gantt chart DrawIO file from pull requests.",
 			Type:        GanttResultType,
+			Args: graphql.FieldConfigArgument{
+				"limit": &graphql.ArgumentConfig{
+					Type:         graphql.Int,
+					DefaultValue: 25,
+				},
+			},
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				srvs, err := util.ServicesFromResolveParams(p)
 				if err != nil {
@@ -128,8 +138,15 @@ var GitHubType = graphql.NewObject(graphql.ObjectConfig{
 					return nil, fmt.Errorf("repository URL is required")
 				}
 
+				// Get the limit parameter
+				limit, ok := p.Args["limit"].(int)
+				if !ok {
+					limit = 25 // Default value
+				}
+
 				params := metrics.GeneratePullRequestsGanttParams{
 					RepositoryURL: repoURL.(string),
+					Limit:         limit,
 				}
 
 				result, err := srvs.MetricsService.GeneratePullRequestsGantt(p.Context, params)
@@ -138,6 +155,7 @@ var GitHubType = graphql.NewObject(graphql.ObjectConfig{
 				}
 
 				return map[string]interface{}{
+					"limit":    result.Limit,
 					"uuid":     result.UUID,
 					"filePath": result.FilePath,
 				}, nil
