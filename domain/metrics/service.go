@@ -10,6 +10,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"slices"
 	"strconv"
 
 	githubClient "github.com/google/go-github/github"
@@ -166,7 +167,7 @@ func (s *service) findPullRequests(ctx context.Context, param types.FindPullRequ
 
 	// Extract pull request metrics.
 	duration := pullRequest.MergedAt.Sub(*pullRequest.CreatedAt)
-	
+
 	var title, body string
 	if pullRequest.Title != nil {
 		title = *pullRequest.Title
@@ -174,7 +175,7 @@ func (s *service) findPullRequests(ctx context.Context, param types.FindPullRequ
 	if pullRequest.Body != nil {
 		body = *pullRequest.Body
 	}
-	
+
 	pr := &types.PullRequest{
 		Duration:              duration,
 		CreatedAt:             pullRequest.CreatedAt,
@@ -331,7 +332,8 @@ func (s *service) GeneratePullRequestsGantt(ctx context.Context, params Generate
 	}
 
 	pullRequests := findAllPullRequestsResult.PullRequests
-	
+	pullRequests = s.sortPullRequestsAsc(pullRequests)
+
 	// Extract repository name for directory structure
 	owner, repo, err := github.RepositoryFromURL(params.RepositoryURL)
 	if err != nil {
@@ -361,26 +363,26 @@ func (s *service) GeneratePullRequestsGantt(ctx context.Context, params Generate
 		if end > len(pullRequests) {
 			end = len(pullRequests)
 		}
-		
+
 		chunk := pullRequests[i:end]
-		
+
 		// Generate UUID for this part
 		fileUUID := uuid.New().String()
-		
+
 		// Generate the Gantt DrawIO file for this chunk
 		drawioContent, err := s.generateGanttDrawIOFromPullRequests(chunk)
 		if err != nil {
 			return nil, fmt.Errorf("failed to generate Gantt for chunk %d: %w", i/limit+1, err)
 		}
-		
+
 		// Create the file path
 		filePath := filepath.Join(baseDir, fileUUID+".drawio")
-		
+
 		// Write the file
 		if err := os.WriteFile(filePath, drawioContent, 0644); err != nil {
 			return nil, fmt.Errorf("failed to write DrawIO file: %w", err)
 		}
-		
+
 		parts = append(parts, GeneratePullRequestsGanttPart{
 			Limit:    len(chunk),
 			UUID:     fileUUID,
@@ -402,7 +404,7 @@ func (s *service) generateGanttDrawIOFromPullRequests(pullRequests []*types.Pull
 	_, filename, _, _ := runtime.Caller(0)
 	repoRoot := filepath.Dir(filepath.Dir(filepath.Dir(filename)))
 	templatePath := filepath.Join(repoRoot, "diagrams", "gantt", "default.drawio")
-	
+
 	templateData, err := os.ReadFile(templatePath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read template file: %w", err)
@@ -422,7 +424,7 @@ func (s *service) generateGanttDrawIOFromPullRequests(pullRequests []*types.Pull
 	diagram := &mxFile.Diagrams[0]
 	preservedCells := []gantt.MxCell{}
 	maxPreservedID := 0
-	
+
 	for _, cell := range diagram.MxGraphModel.Root.Cells {
 		// Parse cell ID as integer to check if it's a task row
 		if cellIDInt, err := strconv.Atoi(cell.ID); err != nil {
@@ -442,13 +444,13 @@ func (s *service) generateGanttDrawIOFromPullRequests(pullRequests []*types.Pull
 	// Generate cells for pull requests
 	startY := 380
 	rowHeight := 20
-	
+
 	// Start new IDs after the highest preserved ID to avoid collisions
 	nextID := maxPreservedID + 1
 	if nextID < 63 {
 		nextID = 63 // Ensure we start at least at 63 for task rows
 	}
-	
+
 	for i, pr := range pullRequests {
 		if pr.CreatedAt == nil || pr.MergedAt == nil {
 			continue
@@ -567,7 +569,7 @@ func (s *service) generateGanttDrawIOFromPullRequests(pullRequests []*types.Pull
 		// Add all cells to the diagram
 		diagram.MxGraphModel.Root.Cells = append(diagram.MxGraphModel.Root.Cells,
 			numberCell, nameCell, contributorsCell, durationCell, startDateCell, endDateCell)
-		
+
 		// Increment nextID by 6 for the next PR
 		nextID += 6
 	}
@@ -581,6 +583,33 @@ func (s *service) generateGanttDrawIOFromPullRequests(pullRequests []*types.Pull
 	// Add XML declaration
 	xmlDeclaration := []byte(`<?xml version="1.0" encoding="UTF-8"?>` + "\n")
 	return append(xmlDeclaration, output...), nil
+}
+
+// sortPullRequests sorts given pull requests by given
+func (s *service) sortPullRequestsAsc(p []*types.PullRequest) []*types.PullRequest {
+	prs := []types.PullRequest{}
+
+	for _, pr := range p {
+		prs = append(prs, *pr)
+	}
+
+	slices.SortFunc(prs, func(a, b types.PullRequest) int {
+		if a.Number > b.Number {
+			return 1
+		}
+		if a.Number < b.Number {
+			return -1
+		}
+		return 0
+	})
+
+	result := []*types.PullRequest{}
+
+	for _, pr := range prs {
+		result = append(result, &pr)
+	}
+
+	return result
 }
 
 func NewService(cache *cachePkg.Cache, HTTPClient *http.Client) (*service, error) {
