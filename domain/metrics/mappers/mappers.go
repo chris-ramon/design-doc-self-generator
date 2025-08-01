@@ -44,9 +44,12 @@ func PullRequestsFromTypeToAPI(pullRequests []*types.PullRequest) api.PullReques
 // PullRequestFromTypeToAPI maps given pull request internal type to pull request API type.
 func PullRequestFromTypeToAPI(pullRequest *types.PullRequest) api.PullRequest {
 	return api.PullRequest{
-		URL:   pullRequest.URL,
-		Title: pullRequest.Title,
-		Body:  pullRequest.Body,
+		Number:    pullRequest.Number,
+		CreatedAt: pullRequest.CreatedAt,
+		MergedAt:  pullRequest.MergedAt,
+		URL:       pullRequest.URL,
+		Title:     pullRequest.Title,
+		Body:      pullRequest.Body,
 		Duration: api.Duration{
 			InDays:                 pullRequest.Duration.Hours() / 24,
 			FormattedIntervalDates: pullRequest.FormattedIntervalDates(),

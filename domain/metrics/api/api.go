@@ -9,6 +9,9 @@ type PullRequest struct {
 	// Duration is the duration time of the pull request.
 	Duration Duration
 
+	// Number is the unique number of the pull request.
+	Number int
+
 	// CreatedAt is the pull request created at time.
 	CreatedAt *time.Time
 

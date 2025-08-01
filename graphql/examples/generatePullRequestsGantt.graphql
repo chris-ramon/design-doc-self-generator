@@ -8,6 +8,20 @@ query generatePullRequestsGantt {
             uuid
             filePath
           }
+          metrics {
+            pullRequests {
+              number
+              createdAt
+              mergedAt
+              title
+              url
+              formattedContributors
+              duration {
+                inDays
+                formattedIntervalDates
+              }
+            }
+          }
         }
       }
     }
