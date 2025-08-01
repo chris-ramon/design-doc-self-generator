@@ -342,7 +342,7 @@ func (s *service) GeneratePullRequestsGantt(ctx context.Context, params Generate
 	// Create the base directory path
 	_, filename, _, _ := runtime.Caller(0)
 	repoRoot := filepath.Dir(filepath.Dir(filepath.Dir(filename)))
-	baseDir := filepath.Join(repoRoot, "diagrams", "gantt", repoName)
+	baseDir := filepath.Join(repoRoot, "diagrams", "gantt", "generated", repoName)
 
 	// Ensure the directory exists
 	if err := os.MkdirAll(baseDir, 0755); err != nil {
