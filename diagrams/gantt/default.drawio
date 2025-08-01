@@ -571,7 +571,7 @@
         <mxCell id="11" value="S" style="fillColor=#23445D;strokeColor=#FFFFFF;strokeWidth=2;fontColor=#FFFFFF;fontStyle=1" parent="1" vertex="1">
           <mxGeometry x="806.5000000000016" y="360.0000000000001" width="20" height="20" as="geometry" />
         </mxCell>
-        <mxCell id="62" value="Contributors" style="fillColor=#23445D;strokeColor=#FFFFFF;strokeWidth=2;fontColor=#FFFFFF;fontStyle=1" parent="1" vertex="1">
+        <mxCell id="header-contributors" value="Contributors" style="fillColor=#23445D;strokeColor=#FFFFFF;strokeWidth=2;fontColor=#FFFFFF;fontStyle=1" parent="1" vertex="1">
           <mxGeometry x="356.5" y="340" width="100" height="40" as="geometry" />
         </mxCell>
         <mxCell id="12" value="Duration" style="fillColor=#23445D;strokeColor=#FFFFFF;strokeWidth=2;fontColor=#FFFFFF;fontStyle=1" parent="1" vertex="1">
