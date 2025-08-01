@@ -2,6 +2,7 @@ package types
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/graphql-go/graphql"
 
@@ -230,6 +231,46 @@ var MetricsType = graphql.NewObject(graphql.ObjectConfig{
 var PullRequestType = graphql.NewObject(graphql.ObjectConfig{
 	Name: "PullRequestType",
 	Fields: graphql.Fields{
+		"number": &graphql.Field{
+			Description: "The pull request number with # prefix",
+			Type:        graphql.String,
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				if pr, ok := p.Source.(map[string]interface{}); ok {
+					if number, exists := pr["Number"]; exists {
+						return fmt.Sprintf("#%d", number), nil
+					}
+				}
+				return nil, nil
+			},
+		},
+		"createdAt": &graphql.Field{
+			Description: "The pull request created at date in Day.Month.Year format",
+			Type:        graphql.String,
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				if pr, ok := p.Source.(map[string]interface{}); ok {
+					if createdAt, exists := pr["CreatedAt"]; exists && createdAt != nil {
+						if t, ok := createdAt.(*time.Time); ok && t != nil {
+							return t.Format("2.1.2006"), nil
+						}
+					}
+				}
+				return nil, nil
+			},
+		},
+		"mergedAt": &graphql.Field{
+			Description: "The pull request merged at date in Day.Month.Year format",
+			Type:        graphql.String,
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				if pr, ok := p.Source.(map[string]interface{}); ok {
+					if mergedAt, exists := pr["MergedAt"]; exists && mergedAt != nil {
+						if t, ok := mergedAt.(*time.Time); ok && t != nil {
+							return t.Format("2.1.2006"), nil
+						}
+					}
+				}
+				return nil, nil
+			},
+		},
 		"url": &graphql.Field{
 			Description: "The pull request url",
 			Type:        graphql.String,
