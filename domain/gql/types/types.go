@@ -88,7 +88,7 @@ var GanttResultType = graphql.NewObject(graphql.ObjectConfig{
 	Name: "GanttResultType",
 	Fields: graphql.Fields{
 		"limit": &graphql.Field{
-			Description: "The limit parameter used for the Gantt generation.",
+			Description: "The number of pull requests included in this Gantt part.",
 			Type:        graphql.Int,
 		},
 		"uuid": &graphql.Field{
@@ -113,8 +113,8 @@ var GitHubType = graphql.NewObject(graphql.ObjectConfig{
 			},
 		},
 		"gantt": &graphql.Field{
-			Description: "Generate a Gantt chart DrawIO file from pull requests.",
-			Type:        GanttResultType,
+			Description: "Generate Gantt chart DrawIO files from pull requests, divided into multiple parts based on the limit.",
+			Type:        graphql.NewList(GanttResultType),
 			Args: graphql.FieldConfigArgument{
 				"limit": &graphql.ArgumentConfig{
 					Type:         graphql.Int,
@@ -146,16 +146,22 @@ var GitHubType = graphql.NewObject(graphql.ObjectConfig{
 					Limit:         limit,
 				}
 
-				result, err := srvs.MetricsService.GeneratePullRequestsGantt(p.Context, params)
+				results, err := srvs.MetricsService.GeneratePullRequestsGantt(p.Context, params)
 				if err != nil {
 					return nil, err
 				}
 
-				return map[string]interface{}{
-					"limit":    result.Limit,
-					"uuid":     result.UUID,
-					"filePath": result.FilePath,
-				}, nil
+				// Convert results to GraphQL format
+				ganttResults := make([]map[string]interface{}, len(results.Parts))
+				for i, part := range results.Parts {
+					ganttResults[i] = map[string]interface{}{
+						"limit":    part.Limit,
+						"uuid":     part.UUID,
+						"filePath": part.FilePath,
+					}
+				}
+
+				return ganttResults, nil
 			},
 		},
 	},

@@ -48,10 +48,14 @@ type FindAllPullRequestsParams struct {
 	RepositoryURL string
 }
 
-type GeneratePullRequestsGanttResult struct {
+type GeneratePullRequestsGanttPart struct {
 	Limit    int
 	UUID     string
 	FilePath string
+}
+
+type GeneratePullRequestsGanttResult struct {
+	Parts []GeneratePullRequestsGanttPart
 }
 
 type GeneratePullRequestsGanttParams struct {
@@ -326,40 +330,66 @@ func (s *service) GeneratePullRequestsGantt(ctx context.Context, params Generate
 		return nil, err
 	}
 
-	// Apply limit to pull requests
 	pullRequests := findAllPullRequestsResult.PullRequests
-	if params.Limit > 0 && len(pullRequests) > params.Limit {
-		pullRequests = pullRequests[:params.Limit]
-	}
-
-	// Generate UUID for the file
-	fileUUID := uuid.New().String()
-
-	// Generate the Gantt DrawIO file
-	drawioContent, err := s.generateGanttDrawIOFromPullRequests(pullRequests)
+	
+	// Extract repository name for directory structure
+	owner, repo, err := github.RepositoryFromURL(params.RepositoryURL)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to extract repository info: %w", err)
 	}
+	repoName := fmt.Sprintf("%s-%s", owner, repo)
 
-	// Create the file path using the same repoRoot approach
+	// Create the base directory path
 	_, filename, _, _ := runtime.Caller(0)
 	repoRoot := filepath.Dir(filepath.Dir(filepath.Dir(filename)))
-	filePath := filepath.Join(repoRoot, "diagrams", "gantt", fileUUID+".drawio")
+	baseDir := filepath.Join(repoRoot, "diagrams", "gantt", repoName)
 
 	// Ensure the directory exists
-	if err := os.MkdirAll(filepath.Dir(filePath), 0755); err != nil {
+	if err := os.MkdirAll(baseDir, 0755); err != nil {
 		return nil, fmt.Errorf("failed to create directory: %w", err)
 	}
 
-	// Write the file
-	if err := os.WriteFile(filePath, drawioContent, 0644); err != nil {
-		return nil, fmt.Errorf("failed to write DrawIO file: %w", err)
+	// Divide pull requests into chunks based on limit
+	var parts []GeneratePullRequestsGanttPart
+	limit := params.Limit
+	if limit <= 0 {
+		limit = 25 // Default limit
+	}
+
+	for i := 0; i < len(pullRequests); i += limit {
+		end := i + limit
+		if end > len(pullRequests) {
+			end = len(pullRequests)
+		}
+		
+		chunk := pullRequests[i:end]
+		
+		// Generate UUID for this part
+		fileUUID := uuid.New().String()
+		
+		// Generate the Gantt DrawIO file for this chunk
+		drawioContent, err := s.generateGanttDrawIOFromPullRequests(chunk)
+		if err != nil {
+			return nil, fmt.Errorf("failed to generate Gantt for chunk %d: %w", i/limit+1, err)
+		}
+		
+		// Create the file path
+		filePath := filepath.Join(baseDir, fileUUID+".drawio")
+		
+		// Write the file
+		if err := os.WriteFile(filePath, drawioContent, 0644); err != nil {
+			return nil, fmt.Errorf("failed to write DrawIO file: %w", err)
+		}
+		
+		parts = append(parts, GeneratePullRequestsGanttPart{
+			Limit:    len(chunk),
+			UUID:     fileUUID,
+			FilePath: filePath,
+		})
 	}
 
 	result := &GeneratePullRequestsGanttResult{
-		Limit:    params.Limit,
-		UUID:     fileUUID,
-		FilePath: filePath,
+		Parts: parts,
 	}
 
 	s.cacheGeneratePullRequestsGanttValue(key, result)

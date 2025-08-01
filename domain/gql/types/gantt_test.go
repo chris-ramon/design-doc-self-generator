@@ -40,8 +40,11 @@ func TestGitHubTypeGantt(t *testing.T) {
 		t.Error("Expected 'gantt' field to exist")
 	}
 
-	if ganttField.Type != GanttResultType {
-		t.Error("Expected gantt field to have GanttResultType")
+	// Check if the type is a list
+	if listType, ok := ganttField.Type.(*graphql.List); !ok {
+		t.Error("Expected gantt field to have List type")
+	} else if listType.OfType != GanttResultType {
+		t.Error("Expected gantt field to have List of GanttResultType")
 	}
 
 	if ganttField.Description == "" {

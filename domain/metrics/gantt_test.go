@@ -114,25 +114,30 @@ func TestGeneratePullRequestsGanttIntegration(t *testing.T) {
 	}
 
 	// Verify result
-	if result.Limit != 5 {
-		t.Errorf("Expected Limit to be 5, got %d", result.Limit)
+	if len(result.Parts) == 0 {
+		t.Error("Expected at least one part to be generated")
 	}
 
-	if result.UUID == "" {
+	firstPart := result.Parts[0]
+	if firstPart.Limit <= 0 || firstPart.Limit > 5 {
+		t.Errorf("Expected Limit to be between 1 and 5, got %d", firstPart.Limit)
+	}
+
+	if firstPart.UUID == "" {
 		t.Error("Expected UUID to be set")
 	}
 
-	if result.FilePath == "" {
+	if firstPart.FilePath == "" {
 		t.Error("Expected FilePath to be set")
 	}
 
 	// Verify file exists
-	if _, err := os.Stat(result.FilePath); os.IsNotExist(err) {
-		t.Errorf("Generated file does not exist: %s", result.FilePath)
+	if _, err := os.Stat(firstPart.FilePath); os.IsNotExist(err) {
+		t.Errorf("Generated file does not exist: %s", firstPart.FilePath)
 	}
 
 	// Verify file content
-	content, err := os.ReadFile(result.FilePath)
+	content, err := os.ReadFile(firstPart.FilePath)
 	if err != nil {
 		t.Fatalf("Failed to read generated file: %v", err)
 	}
@@ -143,8 +148,10 @@ func TestGeneratePullRequestsGanttIntegration(t *testing.T) {
 		t.Fatalf("Generated file is not valid XML: %v", err)
 	}
 
-	// Clean up
-	defer os.Remove(result.FilePath)
+	// Clean up all generated files
+	for _, part := range result.Parts {
+		defer os.Remove(part.FilePath)
+	}
 
-	t.Logf("Successfully generated Gantt file: %s (UUID: %s)", result.FilePath, result.UUID)
+	t.Logf("Successfully generated %d Gantt file(s): first file %s (UUID: %s)", len(result.Parts), firstPart.FilePath, firstPart.UUID)
 }
