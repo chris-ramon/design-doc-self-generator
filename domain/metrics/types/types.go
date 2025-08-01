@@ -95,9 +95,6 @@ func (c *Contributors) FormattedContributors(formatContributorType FormatContrib
 	default:
 		return formattedForHTML()
 	}
-
-	return formattedForHTML()
-
 }
 
 // FormattedIntervalDates formats and returns the created at and merged at dates.
