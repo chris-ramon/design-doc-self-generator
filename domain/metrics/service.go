@@ -458,17 +458,17 @@ func (s *service) generateGanttDrawIOFromPullRequests(pullRequests []*types.Pull
 		yStr := strconv.Itoa(y)
 		baseID := nextID // Use current nextID for this PR
 
-		// Task number cell
+		// PR number cell
 		numberCell := gantt.MxCell{
 			ID:     strconv.Itoa(baseID),
-			Value:  strconv.Itoa(i + 1),
+			Value:  fmt.Sprintf("#%d", pr.Number),
 			Style:  "strokeColor=#DEEDFF;fillColor=#ADC3D9",
 			Parent: "1",
 			Vertex: "1",
 			MxGeometry: &gantt.MxGeometry{
 				X:      "86.5",
 				Y:      yStr,
-				Width:  "40",
+				Width:  "60",
 				Height: "20",
 				As:     "geometry",
 			},
@@ -482,9 +482,25 @@ func (s *service) generateGanttDrawIOFromPullRequests(pullRequests []*types.Pull
 			Parent: "1",
 			Vertex: "1",
 			MxGeometry: &gantt.MxGeometry{
-				X:      "126.5",
+				X:      "146.5",
 				Y:      yStr,
-				Width:  "320",
+				Width:  "250",
+				Height: "20",
+				As:     "geometry",
+			},
+		}
+
+		// Contributors cell
+		contributorsCell := gantt.MxCell{
+			ID:     strconv.Itoa(baseID + 2),
+			Value:  pr.FormattedContributors,
+			Style:  "align=left;strokeColor=#DEEDFF;fillColor=#ADC3D9",
+			Parent: "1",
+			Vertex: "1",
+			MxGeometry: &gantt.MxGeometry{
+				X:      "396.5",
+				Y:      yStr,
+				Width:  "120",
 				Height: "20",
 				As:     "geometry",
 			},
@@ -502,13 +518,13 @@ func (s *service) generateGanttDrawIOFromPullRequests(pullRequests []*types.Pull
 		}
 
 		durationCell := gantt.MxCell{
-			ID:     strconv.Itoa(baseID + 2),
+			ID:     strconv.Itoa(baseID + 3),
 			Value:  durationText,
 			Style:  "strokeColor=#DEEDFF;fillColor=#ADC3D9",
 			Parent: "1",
 			Vertex: "1",
 			MxGeometry: &gantt.MxGeometry{
-				X:      "446.5",
+				X:      "516.5",
 				Y:      yStr,
 				Width:  "80",
 				Height: "20",
@@ -518,13 +534,13 @@ func (s *service) generateGanttDrawIOFromPullRequests(pullRequests []*types.Pull
 
 		// Start date cell
 		startDateCell := gantt.MxCell{
-			ID:     strconv.Itoa(baseID + 3),
+			ID:     strconv.Itoa(baseID + 4),
 			Value:  pr.CreatedAt.Format("02.01.06"),
 			Style:  "strokeColor=#DEEDFF;fillColor=#ADC3D9",
 			Parent: "1",
 			Vertex: "1",
 			MxGeometry: &gantt.MxGeometry{
-				X:      "526.5",
+				X:      "596.5",
 				Y:      yStr,
 				Width:  "80",
 				Height: "20",
@@ -534,13 +550,13 @@ func (s *service) generateGanttDrawIOFromPullRequests(pullRequests []*types.Pull
 
 		// End date cell
 		endDateCell := gantt.MxCell{
-			ID:     strconv.Itoa(baseID + 4),
+			ID:     strconv.Itoa(baseID + 5),
 			Value:  pr.MergedAt.Format("02.01.06"),
 			Style:  "strokeColor=#DEEDFF;fillColor=#ADC3D9",
 			Parent: "1",
 			Vertex: "1",
 			MxGeometry: &gantt.MxGeometry{
-				X:      "606.5",
+				X:      "676.5",
 				Y:      yStr,
 				Width:  "80",
 				Height: "20",
@@ -550,10 +566,10 @@ func (s *service) generateGanttDrawIOFromPullRequests(pullRequests []*types.Pull
 
 		// Add all cells to the diagram
 		diagram.MxGraphModel.Root.Cells = append(diagram.MxGraphModel.Root.Cells,
-			numberCell, nameCell, durationCell, startDateCell, endDateCell)
+			numberCell, nameCell, contributorsCell, durationCell, startDateCell, endDateCell)
 		
-		// Increment nextID by 5 for the next PR
-		nextID += 5
+		// Increment nextID by 6 for the next PR
+		nextID += 6
 	}
 
 	// Marshal back to XML
