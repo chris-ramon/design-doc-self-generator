@@ -19,6 +19,10 @@ func TestGanttResultType(t *testing.T) {
 	}
 
 	fields := GanttResultType.Fields()
+	if _, exists := fields["limit"]; !exists {
+		t.Error("Expected 'limit' field to exist")
+	}
+
 	if _, exists := fields["uuid"]; !exists {
 		t.Error("Expected 'uuid' field to exist")
 	}
@@ -28,24 +32,31 @@ func TestGanttResultType(t *testing.T) {
 	}
 }
 
-func TestGitHubTypeGeneratePullRequestsGantt(t *testing.T) {
-	// Test that the generatePullRequestsGantt field exists
+func TestGitHubTypeGantt(t *testing.T) {
+	// Test that the gantt field exists
 	gitHubFields := GitHubType.Fields()
-	ganttField, exists := gitHubFields["generatePullRequestsGantt"]
+	ganttField, exists := gitHubFields["gantt"]
 	if !exists {
-		t.Error("Expected 'generatePullRequestsGantt' field to exist")
+		t.Error("Expected 'gantt' field to exist")
 	}
 
 	if ganttField.Type != GanttResultType {
-		t.Error("Expected generatePullRequestsGantt field to have GanttResultType")
+		t.Error("Expected gantt field to have GanttResultType")
 	}
 
 	if ganttField.Description == "" {
-		t.Error("Expected generatePullRequestsGantt field to have a description")
+		t.Error("Expected gantt field to have a description")
+	}
+
+	// Test that the limit argument exists
+	if ganttField.Args == nil {
+		t.Error("Expected gantt field to have arguments")
+	} else if len(ganttField.Args) == 0 {
+		t.Error("Expected gantt field to have at least one argument")
 	}
 }
 
-func TestGeneratePullRequestsGanttResolver(t *testing.T) {
+func TestGanttResolver(t *testing.T) {
 	// Create mock services
 	cache := cachePkg.New()
 	httpClient := &http.Client{}
@@ -58,11 +69,14 @@ func TestGeneratePullRequestsGanttResolver(t *testing.T) {
 		MetricsService: metricsService,
 	}
 
-	// Create resolve params
+	// Create resolve params with limit argument
 	params := graphql.ResolveParams{
 		Context: context.Background(),
 		Source: map[string]interface{}{
 			"url": "https://github.com/graphql-go/graphql",
+		},
+		Args: map[string]interface{}{
+			"limit": 10,
 		},
 		Info: graphql.ResolveInfo{
 			RootValue: map[string]interface{}{
@@ -73,7 +87,7 @@ func TestGeneratePullRequestsGanttResolver(t *testing.T) {
 
 	// Get the resolver function
 	gitHubFields := GitHubType.Fields()
-	ganttField := gitHubFields["generatePullRequestsGantt"]
+	ganttField := gitHubFields["gantt"]
 	
 	// Test that the resolver doesn't panic (we can't test the full functionality without GitHub token)
 	defer func() {

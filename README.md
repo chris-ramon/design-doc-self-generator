@@ -28,7 +28,8 @@ query generatePullRequestsGantt {
     analysis {
       information {
         github(url: "https://github.com/graphql-go/graphql") {
-          generatePullRequestsGantt {
+          gantt(limit: 25) {
+            limit
             uuid
             filePath
           }

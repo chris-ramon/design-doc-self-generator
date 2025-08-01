@@ -49,12 +49,14 @@ type FindAllPullRequestsParams struct {
 }
 
 type GeneratePullRequestsGanttResult struct {
+	Limit    int
 	UUID     string
 	FilePath string
 }
 
 type GeneratePullRequestsGanttParams struct {
 	RepositoryURL string
+	Limit         int
 }
 
 // `findPullRequestsCacheKey` returns cache key of `FindPullRequests`.
@@ -324,11 +326,17 @@ func (s *service) GeneratePullRequestsGantt(ctx context.Context, params Generate
 		return nil, err
 	}
 
+	// Apply limit to pull requests
+	pullRequests := findAllPullRequestsResult.PullRequests
+	if params.Limit > 0 && len(pullRequests) > params.Limit {
+		pullRequests = pullRequests[:params.Limit]
+	}
+
 	// Generate UUID for the file
 	fileUUID := uuid.New().String()
 
 	// Generate the Gantt DrawIO file
-	drawioContent, err := s.generateGanttDrawIOFromPullRequests(findAllPullRequestsResult.PullRequests)
+	drawioContent, err := s.generateGanttDrawIOFromPullRequests(pullRequests)
 	if err != nil {
 		return nil, err
 	}
@@ -349,6 +357,7 @@ func (s *service) GeneratePullRequestsGantt(ctx context.Context, params Generate
 	}
 
 	result := &GeneratePullRequestsGanttResult{
+		Limit:    params.Limit,
 		UUID:     fileUUID,
 		FilePath: filePath,
 	}

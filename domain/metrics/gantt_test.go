@@ -104,6 +104,7 @@ func TestGeneratePullRequestsGanttIntegration(t *testing.T) {
 	// Test with a small public repository
 	params := GeneratePullRequestsGanttParams{
 		RepositoryURL: "https://github.com/graphql-go/graphql",
+		Limit:         5,
 	}
 
 	ctx := context.Background()
@@ -113,6 +114,10 @@ func TestGeneratePullRequestsGanttIntegration(t *testing.T) {
 	}
 
 	// Verify result
+	if result.Limit != 5 {
+		t.Errorf("Expected Limit to be 5, got %d", result.Limit)
+	}
+
 	if result.UUID == "" {
 		t.Error("Expected UUID to be set")
 	}
