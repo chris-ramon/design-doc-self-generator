@@ -161,6 +161,7 @@ func (s *service) findPullRequests(ctx context.Context, param types.FindPullRequ
 			c := types.Contributor{
 				ProfileURL: string(participant.URL),
 				ID:         string(participant.ID),
+				Login:      string(participant.Login),
 			}
 			contributors = append(contributors, c)
 		}
@@ -259,6 +260,7 @@ func (s *service) FindAllPullRequests(ctx context.Context, params FindAllPullReq
 			c := types.Contributor{
 				ProfileURL: string(participant.URL),
 				ID:         string(participant.ID),
+				Login:      string(participant.Login),
 			}
 			contributors = append(contributors, c)
 		}
