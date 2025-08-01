@@ -50,6 +50,9 @@ type Contributor struct {
 	// ID is the contributor ID.
 	ID string
 
+	// Login is the contributor login.
+	Login string
+
 	// ProfileURL is the contributor profile URL.
 	ProfileURL string
 }
@@ -69,10 +72,10 @@ func (c *Contributors) FormattedContributors(formatContributorType FormatContrib
 		result := []string{}
 
 		for _, contributor := range *c {
-			result = append(result, contributor.ID)
+			result = append(result, contributor.Login)
 		}
 
-		return strings.Join(result, ",")
+		return strings.Join(result, ", ")
 	}
 
 	formattedForHTML := func() string {
