@@ -42,10 +42,11 @@ query generatePullRequestsGantt {
 
 This query will:
 1. Fetch all pull requests from the specified GitHub repository
-2. Generate a Gantt chart DrawIO file using pull request titles instead of task names
-3. Store the file in `diagrams/gantt/<uuid>.drawio`
-4. Cache the file content as bytes using the UUID as the key
-5. Return the UUID and file path of the generated file
+2. Divide the pull requests into multiple Gantt charts based on the limit parameter
+3. Generate Gantt chart DrawIO files using pull request titles instead of task names
+4. Store the files in `diagrams/gantt/<repository-name>/<uuid>.drawio`
+5. Cache the file content as bytes using the UUID as the key
+6. Return an array of objects, each containing the UUID and file path of a generated file
 
 #### Obtaining pull request data from GitHub by URLs
 
