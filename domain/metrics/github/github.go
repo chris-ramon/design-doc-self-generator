@@ -54,6 +54,7 @@ type Participants struct {
 
 type ParticipantsNode struct {
 	URL githubv4.String
+	ID  githubv4.String
 }
 
 type ParticipantsNodes []ParticipantsNode
@@ -105,13 +106,13 @@ type AllPullRequestsNode struct {
 func (gh *GitHub) AllPullRequests(params AllPullRequestsParams) (AllPullRequestsQuery, error) {
 	finalQuery := AllPullRequestsQuery{}
 	var allNodes AllPullRequestsNodes
-	
+
 	var cursor *githubv4.String
 	maxIterations := 10
-	
+
 	for i := 0; i < maxIterations; i++ {
 		query := AllPullRequestsQuery{}
-		
+
 		variables := map[string]interface{}{
 			"repositoryOwner":   githubv4.String(params.Owner),
 			"repositoryName":    githubv4.String(params.Repo),
@@ -124,27 +125,27 @@ func (gh *GitHub) AllPullRequests(params AllPullRequestsParams) (AllPullRequests
 		if err != nil {
 			return finalQuery, err
 		}
-		
+
 		// Append nodes from this page to our collection
 		allNodes = append(allNodes, query.Repository.PullRequests.Nodes...)
-		
+
 		// Check if there are more pages
 		if !query.Repository.PullRequests.PageInfo.HasNextPage {
 			break
 		}
-		
+
 		// Set cursor for next iteration
 		next := query.Repository.PullRequests.PageInfo.EndCursor
 		cursor = &next
 	}
-	
+
 	// Build the final result with all collected nodes
 	finalQuery.Repository.PullRequests.Nodes = allNodes
 	finalQuery.Repository.PullRequests.PageInfo = PageInfo{
 		HasNextPage: githubv4.Boolean(false), // We've collected all available pages
 		EndCursor:   githubv4.String(""),
 	}
-	
+
 	return finalQuery, nil
 }
 
