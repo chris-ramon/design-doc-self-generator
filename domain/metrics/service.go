@@ -441,6 +441,36 @@ func (s *service) generateGanttDrawIOFromPullRequests(pullRequests []*types.Pull
 	}
 	diagram.MxGraphModel.Root.Cells = preservedCells
 
+	prNumberCell := gantt.MxCell{}
+	taskNameCell := gantt.MxCell{}
+	contributorsCell := gantt.MxCell{}
+	durationCell := gantt.MxCell{}
+	startAtCell := gantt.MxCell{}
+	mergedAtCell := gantt.MxCell{}
+
+	for _, cell := range preservedCells {
+		if cell.MxGeometry != nil {
+			if cell.Value == "PR #" {
+				prNumberCell = cell
+			}
+			if cell.Value == "Task Name" {
+				taskNameCell = cell
+			}
+			if cell.Value == "Contributors" {
+				contributorsCell = cell
+			}
+			if cell.Value == "Duration" {
+				durationCell = cell
+			}
+			if cell.Value == "Created At" {
+				startAtCell = cell
+			}
+			if cell.Value == "Merged At" {
+				mergedAtCell = cell
+			}
+		}
+	}
+
 	// Generate cells for pull requests
 	startY := 380
 	rowHeight := 20
@@ -468,7 +498,7 @@ func (s *service) generateGanttDrawIOFromPullRequests(pullRequests []*types.Pull
 			Parent: "1",
 			Vertex: "1",
 			MxGeometry: &gantt.MxGeometry{
-				X:      "86.5",
+				X:      prNumberCell.MxGeometry.X,
 				Y:      yStr,
 				Width:  "50",
 				Height: "20",
@@ -484,7 +514,7 @@ func (s *service) generateGanttDrawIOFromPullRequests(pullRequests []*types.Pull
 			Parent: "1",
 			Vertex: "1",
 			MxGeometry: &gantt.MxGeometry{
-				X:      "136.5",
+				X:      taskNameCell.MxGeometry.X,
 				Y:      yStr,
 				Width:  "220",
 				Height: "20",
@@ -500,7 +530,7 @@ func (s *service) generateGanttDrawIOFromPullRequests(pullRequests []*types.Pull
 			Parent: "1",
 			Vertex: "1",
 			MxGeometry: &gantt.MxGeometry{
-				X:      "356.5",
+				X:      contributorsCell.MxGeometry.X,
 				Y:      yStr,
 				Width:  "100",
 				Height: "20",
@@ -526,7 +556,7 @@ func (s *service) generateGanttDrawIOFromPullRequests(pullRequests []*types.Pull
 			Parent: "1",
 			Vertex: "1",
 			MxGeometry: &gantt.MxGeometry{
-				X:      "697.5",
+				X:      durationCell.MxGeometry.X,
 				Y:      yStr,
 				Width:  "70",
 				Height: "20",
@@ -542,7 +572,7 @@ func (s *service) generateGanttDrawIOFromPullRequests(pullRequests []*types.Pull
 			Parent: "1",
 			Vertex: "1",
 			MxGeometry: &gantt.MxGeometry{
-				X:      "767.5",
+				X:      startAtCell.MxGeometry.X,
 				Y:      yStr,
 				Width:  "80",
 				Height: "20",
@@ -558,7 +588,7 @@ func (s *service) generateGanttDrawIOFromPullRequests(pullRequests []*types.Pull
 			Parent: "1",
 			Vertex: "1",
 			MxGeometry: &gantt.MxGeometry{
-				X:      "847.5",
+				X:      mergedAtCell.MxGeometry.X,
 				Y:      yStr,
 				Width:  "80",
 				Height: "20",
