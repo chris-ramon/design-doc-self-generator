@@ -496,7 +496,7 @@ func (s *service) generateGanttDrawIOFromPullRequests(pullRequests []*types.Pull
 		numberCell := gantt.MxCell{
 			ID:     strconv.Itoa(baseID),
 			Value:  fmt.Sprintf("#%d", pr.Number),
-			Style:  "strokeColor=#DEEDFF;fillColor=#ADC3D9",
+			Style:  "strokeColor=#DEEDFF;fillColor=#FFF",
 			Parent: "1",
 			Vertex: "1",
 			MxGeometry: &gantt.MxGeometry{
@@ -512,7 +512,7 @@ func (s *service) generateGanttDrawIOFromPullRequests(pullRequests []*types.Pull
 		nameCell := gantt.MxCell{
 			ID:     strconv.Itoa(baseID + 1),
 			Value:  pr.Title,
-			Style:  "align=left;strokeColor=#DEEDFF;fillColor=#ADC3D9",
+			Style:  "align=left;strokeColor=#DEEDFF;fillColor=#FFF",
 			Parent: "1",
 			Vertex: "1",
 			MxGeometry: &gantt.MxGeometry{
@@ -528,7 +528,7 @@ func (s *service) generateGanttDrawIOFromPullRequests(pullRequests []*types.Pull
 		contributorsCell := gantt.MxCell{
 			ID:     strconv.Itoa(baseID + 2),
 			Value:  pr.FormattedContributors,
-			Style:  "align=left;strokeColor=#DEEDFF;fillColor=#ADC3D9",
+			Style:  "align=left;strokeColor=#DEEDFF;fillColor=#FFF",
 			Parent: "1",
 			Vertex: "1",
 			MxGeometry: &gantt.MxGeometry{
@@ -554,7 +554,7 @@ func (s *service) generateGanttDrawIOFromPullRequests(pullRequests []*types.Pull
 		durationCell := gantt.MxCell{
 			ID:     strconv.Itoa(baseID + 3),
 			Value:  durationText,
-			Style:  "strokeColor=#DEEDFF;fillColor=#ADC3D9",
+			Style:  "strokeColor=#DEEDFF;fillColor=#FFF",
 			Parent: "1",
 			Vertex: "1",
 			MxGeometry: &gantt.MxGeometry{
@@ -570,7 +570,7 @@ func (s *service) generateGanttDrawIOFromPullRequests(pullRequests []*types.Pull
 		startDateCell := gantt.MxCell{
 			ID:     strconv.Itoa(baseID + 4),
 			Value:  pr.CreatedAt.UTC().Format("02.01.06"),
-			Style:  "strokeColor=#DEEDFF;fillColor=#ADC3D9",
+			Style:  "strokeColor=#DEEDFF;fillColor=#FFF",
 			Parent: "1",
 			Vertex: "1",
 			MxGeometry: &gantt.MxGeometry{
@@ -586,7 +586,7 @@ func (s *service) generateGanttDrawIOFromPullRequests(pullRequests []*types.Pull
 		endDateCell := gantt.MxCell{
 			ID:     strconv.Itoa(baseID + 5),
 			Value:  pr.MergedAt.UTC().Format("02.01.06"),
-			Style:  "strokeColor=#DEEDFF;fillColor=#ADC3D9",
+			Style:  "strokeColor=#DEEDFF;fillColor=#FFF",
 			Parent: "1",
 			Vertex: "1",
 			MxGeometry: &gantt.MxGeometry{
