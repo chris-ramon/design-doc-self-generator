@@ -45,6 +45,14 @@ type PullRequest struct {
 	FormattedContributors string
 }
 
+// AbbreviatedBody returns the abbreviated pull request's body.
+func (p *PullRequest) AbbreviatedBody() string {
+	if len(p.Body) < 150 {
+		return p.Body
+	}
+	return fmt.Sprintf("%s ...", p.Body[:150])
+}
+
 // Contributor represents the pull request contributor.
 type Contributor struct {
 	// ID is the contributor ID.
