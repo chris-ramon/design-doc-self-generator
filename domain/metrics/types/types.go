@@ -2,6 +2,7 @@ package types
 
 import (
 	"fmt"
+	"log"
 	"strings"
 	"time"
 )
@@ -43,6 +44,15 @@ type PullRequest struct {
 
 	// FormattedContributors are the pull request's formatted contributors.
 	FormattedContributors string
+}
+
+// AbbreviatedBody returns the abbreviated pull request's body.
+func (p *PullRequest) AbbreviatedBody() string {
+	log.Println(p.Body)
+	if len(p.Body) < 150 {
+		return p.Body
+	}
+	return fmt.Sprintf("%s ...", p.Body[:150])
 }
 
 // Contributor represents the pull request contributor.
