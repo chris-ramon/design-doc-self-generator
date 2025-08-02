@@ -622,7 +622,7 @@ func (s *service) generateGanttDrawIOFromPullRequests(pullRequests []*types.Pull
 		diagram.MxGraphModel.Root.Cells = append(diagram.MxGraphModel.Root.Cells,
 			numberCell, nameCell, contributorsCell, durationCell, startDateCell, endDateCell, taskDetailCell)
 
-		// Increment nextID by 6 for the next PR
+		// Increment nextID by 7 for the next PR
 		nextID += 7
 	}
 
