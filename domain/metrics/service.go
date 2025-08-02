@@ -20,6 +20,7 @@ import (
 	"github.com/chris-ramon/golang-scaffolding/domain/metrics/github"
 	"github.com/chris-ramon/golang-scaffolding/domain/metrics/types"
 	"github.com/chris-ramon/golang-scaffolding/drawio/gantt"
+	"github.com/chris-ramon/golang-scaffolding/pkg/markdown"
 )
 
 type service struct {
@@ -453,6 +454,7 @@ func (s *service) generateGanttDrawIOFromPullRequests(pullRequests []*types.Pull
 	templateDurationCell := gantt.MxCell{}
 	templateStartAtCell := gantt.MxCell{}
 	templateMergedAtCell := gantt.MxCell{}
+	templateTaskDetailsCell := gantt.MxCell{}
 
 	for _, cell := range preservedCells {
 		if cell.MxGeometry != nil {
@@ -469,6 +471,8 @@ func (s *service) generateGanttDrawIOFromPullRequests(pullRequests []*types.Pull
 				templateStartAtCell = cell
 			case "Merged At":
 				templateMergedAtCell = cell
+			case "Task Details":
+				templateTaskDetailsCell = cell
 			}
 		}
 	}
@@ -598,12 +602,28 @@ func (s *service) generateGanttDrawIOFromPullRequests(pullRequests []*types.Pull
 			},
 		}
 
+		// Task detail cell
+		taskDetailCell := gantt.MxCell{
+			ID:     strconv.Itoa(baseID + 6),
+			Value:  markdown.StripMarkdown(pr.AbbreviatedBody()),
+			Style:  "align=left;strokeColor=#DEEDFF;fillColor=#FFF",
+			Parent: "1",
+			Vertex: "1",
+			MxGeometry: &gantt.MxGeometry{
+				X:      templateTaskDetailsCell.MxGeometry.X,
+				Y:      yStr,
+				Width:  templateTaskDetailsCell.MxGeometry.Width,
+				Height: "20",
+				As:     "geometry",
+			},
+		}
+
 		// Add all cells to the diagram
 		diagram.MxGraphModel.Root.Cells = append(diagram.MxGraphModel.Root.Cells,
-			numberCell, nameCell, contributorsCell, durationCell, startDateCell, endDateCell)
+			numberCell, nameCell, contributorsCell, durationCell, startDateCell, endDateCell, taskDetailCell)
 
 		// Increment nextID by 6 for the next PR
-		nextID += 6
+		nextID += 7
 	}
 
 	// Marshal back to XML
