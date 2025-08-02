@@ -16,7 +16,7 @@ func DemoParseGanttChart() {
 	// Get the path to the DrawIO file using runtime.Caller
 	_, filename, _, _ := runtime.Caller(0)
 	repoRoot := filepath.Dir(filepath.Dir(filepath.Dir(filename)))
-	drawioPath := filepath.Join(repoRoot, "diagrams", "gantt", "default.drawio")
+	drawioPath := filepath.Join(repoRoot, "diagrams", "gantt", "template", "basic.drawio")
 	
 	// Read the DrawIO file
 	data, err := os.ReadFile(drawioPath)
