@@ -136,7 +136,7 @@ go test -v
 ```
 
 The tests include:
-- Parsing the actual DrawIO file from `../../diagrams/gantt/default.drawio`
+- Parsing the actual DrawIO file from `../../diagrams/gantt/template/basic.drawio`
 - Creating and marshaling new DrawIO structures
 - Verifying round-trip XML parsing
 

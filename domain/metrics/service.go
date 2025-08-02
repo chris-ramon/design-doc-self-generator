@@ -409,7 +409,7 @@ func (s *service) generateGanttDrawIOFromPullRequests(pullRequests []*types.Pull
 	// Get the repository root directory using runtime.Caller
 	_, filename, _, _ := runtime.Caller(0)
 	repoRoot := filepath.Dir(filepath.Dir(filepath.Dir(filename)))
-	templatePath := filepath.Join(repoRoot, "diagrams", "gantt", "default.drawio")
+	templatePath := filepath.Join(repoRoot, "diagrams", "gantt", "template", "basic.drawio")
 
 	templateData, err := os.ReadFile(templatePath)
 	if err != nil {
