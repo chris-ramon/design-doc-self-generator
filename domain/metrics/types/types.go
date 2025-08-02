@@ -2,7 +2,6 @@ package types
 
 import (
 	"fmt"
-	"log"
 	"strings"
 	"time"
 )
@@ -48,7 +47,6 @@ type PullRequest struct {
 
 // AbbreviatedBody returns the abbreviated pull request's body.
 func (p *PullRequest) AbbreviatedBody() string {
-	log.Println(p.Body)
 	if len(p.Body) < 150 {
 		return p.Body
 	}
