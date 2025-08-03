@@ -100,6 +100,17 @@ func TestGitHubPullRequestType(t *testing.T) {
 	} else if len(resultMap) != 0 {
 		t.Errorf("Expected empty map from text resolver, got: %v", resultMap)
 	}
+
+	// Test that the export field exists
+	exportField, exists := fields["export"]
+	if !exists {
+		t.Error("Expected 'export' field to exist")
+	}
+
+	// Check that the export field has the correct type
+	if exportField.Type != graphql.String {
+		t.Error("Expected 'export' field to have String type")
+	}
 }
 
 func TestGitHubTypeGantt(t *testing.T) {
