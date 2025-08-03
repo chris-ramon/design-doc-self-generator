@@ -2,6 +2,9 @@ package types
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/graphql-go/graphql"
@@ -11,6 +14,7 @@ import (
 	"github.com/chris-ramon/golang-scaffolding/domain/metrics/api"
 	"github.com/chris-ramon/golang-scaffolding/domain/metrics/github"
 	"github.com/chris-ramon/golang-scaffolding/domain/metrics/mappers"
+	metricTypes "github.com/chris-ramon/golang-scaffolding/domain/metrics/types"
 )
 
 var CurrentUserType = graphql.NewObject(graphql.ObjectConfig{
@@ -385,6 +389,87 @@ var GitHubPullRequestType = graphql.NewObject(graphql.ObjectConfig{
 			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 				// Return empty object for now as per requirements
 				return map[string]interface{}{}, nil
+			},
+		},
+		"export": &graphql.Field{
+			Description: "Export pull requests from a repository to a file.",
+			Type:        graphql.String,
+			Args: graphql.FieldConfigArgument{
+				"repositoryURL": &graphql.ArgumentConfig{
+					Type:        graphql.NewNonNull(graphql.String),
+					Description: "The GitHub repository URL to export pull requests from",
+				},
+			},
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				srvs, err := util.ServicesFromResolveParams(p)
+				if err != nil {
+					return nil, err
+				}
+
+				repositoryURL, err := util.FieldFromArgs[string](p.Args, "repositoryURL")
+				if err != nil {
+					return nil, err
+				}
+
+				// Extract owner and repo from URL
+				_, repo, err := github.RepositoryFromURL(repositoryURL)
+				if err != nil {
+					return nil, err
+				}
+
+				// Fetch all pull requests
+				params := metrics.FindAllPullRequestsParams{
+					RepositoryURL: repositoryURL,
+				}
+
+				result, err := srvs.MetricsService.FindAllPullRequests(p.Context, params)
+				if err != nil {
+					return nil, err
+				}
+
+				// Create export file path
+				exportDir := filepath.Join("assets", fmt.Sprintf("-%s", repo), "exports", "pull_requests")
+				exportPath := filepath.Join(exportDir, "data.txt")
+
+				// Check if file already exists
+				if _, err := os.Stat(exportPath); err == nil {
+					return fmt.Sprintf("Export file already exists at %s", exportPath), nil
+				}
+
+				// Create directory if it doesn't exist
+				if err := os.MkdirAll(exportDir, 0755); err != nil {
+					return nil, fmt.Errorf("failed to create export directory: %v", err)
+				}
+
+				// Prepare export data
+				var lines []string
+				for _, pr := range result.PullRequests {
+					if pr.CreatedAt == nil || pr.MergedAt == nil {
+						continue
+					}
+
+					duration := pr.MergedAt.Sub(*pr.CreatedAt)
+					formattedContributors := pr.Contributors.FormattedContributors(metricTypes.CommasFormatContributorType)
+					
+					line := fmt.Sprintf("%d|%s|%s|%s|%s|%s|%s",
+						pr.Number,
+						pr.Title,
+						formattedContributors,
+						duration.String(),
+						pr.CreatedAt.Format(time.RFC3339),
+						pr.MergedAt.Format(time.RFC3339),
+						pr.AbbreviatedBody(),
+					)
+					lines = append(lines, line)
+				}
+
+				// Write to file
+				content := strings.Join(lines, "\n")
+				if err := os.WriteFile(exportPath, []byte(content), 0644); err != nil {
+					return nil, fmt.Errorf("failed to write export file: %v", err)
+				}
+
+				return fmt.Sprintf("Successfully exported %d pull requests to %s", len(lines), exportPath), nil
 			},
 		},
 	},
