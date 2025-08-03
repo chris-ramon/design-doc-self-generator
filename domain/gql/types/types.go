@@ -166,6 +166,14 @@ var GitHubType = graphql.NewObject(graphql.ObjectConfig{
 				return ganttResults, nil
 			},
 		},
+		"pullRequests": &graphql.Field{
+			Description: "The pull requests information with text data.",
+			Type:        graphql.NewList(GitHubPullRequestType),
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				// Return empty array for now as per requirements
+				return []interface{}{}, nil
+			},
+		},
 	},
 })
 
@@ -342,6 +350,42 @@ var ContributorType = graphql.NewObject(graphql.ObjectConfig{
 		"profileUrl": &graphql.Field{
 			Description: "The profile url of a contributor.",
 			Type:        graphql.String,
+		},
+	},
+})
+
+var PullRequestTextType = graphql.NewObject(graphql.ObjectConfig{
+	Name: "PullRequestTextType",
+	Fields: graphql.Fields{
+		"uuid": &graphql.Field{
+			Description: "The UUID of the pull request text.",
+			Type:        graphql.String,
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				// Return empty string for now as per requirements
+				return "", nil
+			},
+		},
+		"filePath": &graphql.Field{
+			Description: "The file path of the pull request text.",
+			Type:        graphql.String,
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				// Return empty string for now as per requirements
+				return "", nil
+			},
+		},
+	},
+})
+
+var GitHubPullRequestType = graphql.NewObject(graphql.ObjectConfig{
+	Name: "GitHubPullRequestType",
+	Fields: graphql.Fields{
+		"text": &graphql.Field{
+			Description: "The text information of the pull request.",
+			Type:        PullRequestTextType,
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				// Return empty object for now as per requirements
+				return map[string]interface{}{}, nil
+			},
 		},
 	},
 })

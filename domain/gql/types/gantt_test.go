@@ -32,6 +32,76 @@ func TestGanttResultType(t *testing.T) {
 	}
 }
 
+func TestPullRequestTextType(t *testing.T) {
+	// Test that the PullRequestTextType is properly defined
+	if PullRequestTextType.Name() != "PullRequestTextType" {
+		t.Errorf("Expected type name 'PullRequestTextType', got '%s'", PullRequestTextType.Name())
+	}
+
+	fields := PullRequestTextType.Fields()
+	if _, exists := fields["uuid"]; !exists {
+		t.Error("Expected 'uuid' field to exist")
+	}
+
+	if _, exists := fields["filePath"]; !exists {
+		t.Error("Expected 'filePath' field to exist")
+	}
+
+	// Test that fields have resolvers that return empty strings
+	params := graphql.ResolveParams{}
+	
+	uuidField := fields["uuid"]
+	result, err := uuidField.Resolve(params)
+	if err != nil {
+		t.Errorf("Expected no error from uuid resolver, got: %v", err)
+	}
+	if result != "" {
+		t.Errorf("Expected empty string from uuid resolver, got: %v", result)
+	}
+
+	filePathField := fields["filePath"]
+	result, err = filePathField.Resolve(params)
+	if err != nil {
+		t.Errorf("Expected no error from filePath resolver, got: %v", err)
+	}
+	if result != "" {
+		t.Errorf("Expected empty string from filePath resolver, got: %v", result)
+	}
+}
+
+func TestGitHubPullRequestType(t *testing.T) {
+	// Test that the GitHubPullRequestType is properly defined
+	if GitHubPullRequestType.Name() != "GitHubPullRequestType" {
+		t.Errorf("Expected type name 'GitHubPullRequestType', got '%s'", GitHubPullRequestType.Name())
+	}
+
+	fields := GitHubPullRequestType.Fields()
+	textField, exists := fields["text"]
+	if !exists {
+		t.Error("Expected 'text' field to exist")
+	}
+
+	// Check that the text field has the correct type
+	if textField.Type != PullRequestTextType {
+		t.Error("Expected 'text' field to have PullRequestTextType")
+	}
+
+	// Test that the text field resolver returns empty object
+	params := graphql.ResolveParams{}
+	result, err := textField.Resolve(params)
+	if err != nil {
+		t.Errorf("Expected no error from text resolver, got: %v", err)
+	}
+	if result == nil {
+		t.Error("Expected non-nil result from text resolver")
+	}
+	if resultMap, ok := result.(map[string]interface{}); !ok {
+		t.Error("Expected result from text resolver to be map[string]interface{}")
+	} else if len(resultMap) != 0 {
+		t.Errorf("Expected empty map from text resolver, got: %v", resultMap)
+	}
+}
+
 func TestGitHubTypeGantt(t *testing.T) {
 	// Test that the gantt field exists
 	gitHubFields := GitHubType.Fields()
@@ -56,6 +126,41 @@ func TestGitHubTypeGantt(t *testing.T) {
 		t.Error("Expected gantt field to have arguments")
 	} else if len(ganttField.Args) == 0 {
 		t.Error("Expected gantt field to have at least one argument")
+	}
+}
+
+func TestGitHubTypePullRequests(t *testing.T) {
+	// Test that the pullRequests field exists
+	gitHubFields := GitHubType.Fields()
+	pullRequestsField, exists := gitHubFields["pullRequests"]
+	if !exists {
+		t.Error("Expected 'pullRequests' field to exist")
+	}
+
+	// Check if the type is a list
+	if listType, ok := pullRequestsField.Type.(*graphql.List); !ok {
+		t.Error("Expected pullRequests field to have List type")
+	} else if listType.OfType != GitHubPullRequestType {
+		t.Error("Expected pullRequests field to have List of GitHubPullRequestType")
+	}
+
+	if pullRequestsField.Description == "" {
+		t.Error("Expected pullRequests field to have a description")
+	}
+
+	// Test that the resolver returns empty array
+	params := graphql.ResolveParams{}
+	result, err := pullRequestsField.Resolve(params)
+	if err != nil {
+		t.Errorf("Expected no error from pullRequests resolver, got: %v", err)
+	}
+	if result == nil {
+		t.Error("Expected non-nil result from pullRequests resolver")
+	}
+	if resultArray, ok := result.([]interface{}); !ok {
+		t.Error("Expected result from pullRequests resolver to be []interface{}")
+	} else if len(resultArray) != 0 {
+		t.Errorf("Expected empty array from pullRequests resolver, got: %v", resultArray)
 	}
 }
 
