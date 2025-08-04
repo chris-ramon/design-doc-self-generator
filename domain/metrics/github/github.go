@@ -100,6 +100,11 @@ type AllPullRequestsNode struct {
 		Name githubv4.String
 	}
 	Participants Participants `graphql:"participants(first: $participantsFirst)"`
+	Author       Author       `graphql:"author"`
+}
+
+type Author struct {
+	Login githubv4.String
 }
 
 // AllPullRequests fetches all merged pull requests from a repository with pagination support.

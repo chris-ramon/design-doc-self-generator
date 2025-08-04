@@ -2,6 +2,7 @@ package types
 
 import (
 	"fmt"
+	"github.com/chris-ramon/golang-scaffolding/pkg/markdown"
 	"strings"
 	"time"
 )
@@ -43,14 +44,25 @@ type PullRequest struct {
 
 	// FormattedContributors are the pull request's formatted contributors.
 	FormattedContributors string
+
+	// Author is pull request's author.
+	Author Author
+}
+
+// Author represents the pull request author.
+type Author struct {
+	// Login is the contributor login.
+	Login string
 }
 
 // AbbreviatedBody returns the abbreviated pull request's body.
 func (p *PullRequest) AbbreviatedBody() string {
-	if len(p.Body) < 150 {
-		return p.Body
+	bodyWithoutMarkdown := markdown.StripMarkdown(p.Body)
+
+	if len(bodyWithoutMarkdown) <= 150 {
+		return bodyWithoutMarkdown
 	}
-	return fmt.Sprintf("%s ...", p.Body[:150])
+	return fmt.Sprintf("%s ...", bodyWithoutMarkdown[:150])
 }
 
 // Contributor represents the pull request contributor.
