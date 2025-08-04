@@ -428,7 +428,7 @@ var GitHubPullRequestType = graphql.NewObject(graphql.ObjectConfig{
 				}
 
 				// Create export file path
-				exportDir := filepath.Join("assets", fmt.Sprintf("-%s", repo), "exports", "pull_requests")
+				exportDir := filepath.Join("assets", "generated", repo, "exports", "pull_requests")
 				exportPath := filepath.Join(exportDir, "data.txt")
 
 				// Check if file already exists
@@ -450,7 +450,7 @@ var GitHubPullRequestType = graphql.NewObject(graphql.ObjectConfig{
 
 					duration := pr.MergedAt.Sub(*pr.CreatedAt)
 					formattedContributors := pr.Contributors.FormattedContributors(metricTypes.CommasFormatContributorType)
-					
+
 					line := fmt.Sprintf("%d|%s|%s|%s|%s|%s|%s",
 						pr.Number,
 						pr.Title,
@@ -474,4 +474,3 @@ var GitHubPullRequestType = graphql.NewObject(graphql.ObjectConfig{
 		},
 	},
 })
-
