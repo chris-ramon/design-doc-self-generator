@@ -257,7 +257,13 @@ func (s *service) FindAllPullRequests(ctx context.Context, params FindAllPullReq
 		}
 
 		contributors := types.Contributors{}
+		contributors = append(contributors, types.Contributor{
+			Login: string(prNode.Author.Login),
+		})
 		for _, participant := range prNode.Participants.Nodes {
+			if participant.Login == prNode.Author.Login {
+				continue
+			}
 			c := types.Contributor{
 				ProfileURL: string(participant.URL),
 				ID:         string(participant.ID),
