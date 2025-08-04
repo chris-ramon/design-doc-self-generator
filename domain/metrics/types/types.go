@@ -57,7 +57,7 @@ type Author struct {
 
 // AbbreviatedBody returns the abbreviated pull request's body.
 func (p *PullRequest) AbbreviatedBody() string {
-	bodyWithoutMarkdown := markdown.StripMarkdown(b)
+	bodyWithoutMarkdown := markdown.StripMarkdown(p.Body)
 
 	if len(bodyWithoutMarkdown) <= 150 {
 		return bodyWithoutMarkdown
