@@ -23,7 +23,10 @@ func main() {
 		log.Fatal(err)
 	}
 
-	conf := config.New()
+	conf, err := config.New()
+	if err != nil {
+		handleErr(err)
+	}
 	dbConf := config.NewDBConfig()
 
 	db, err := db.New(dbConf)
@@ -47,7 +50,7 @@ func main() {
 	}
 	usersRoutes := users.NewRoutes(usersHandlers)
 
-	jwt, err := jwt.NewJWT()
+	jwt, err := jwt.NewJWT(conf.JWTConfig)
 	if err != nil {
 		handleErr(err)
 	}
