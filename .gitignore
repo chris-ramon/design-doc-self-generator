@@ -4,5 +4,8 @@ coverage.out
 .env
 golang-scaffolding
 diagrams/gantt/generated
-app.rsa
-app.rsa.pub
+**/app.rsa
+**/app.rsa.pub
+# Optional, if you keep PEM/key files locally
+**/*.pem
+**/*.key
