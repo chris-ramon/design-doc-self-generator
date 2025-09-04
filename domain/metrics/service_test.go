@@ -28,7 +28,7 @@ func (m *mockGitHub) Query(query any) error {
 
 func TestFindAllPullRequests(t *testing.T) {
 	cache := cachePkg.New()
-	
+
 	createdAt := time.Now().Add(-7 * 24 * time.Hour)
 	mergedAt := time.Now()
 
@@ -39,6 +39,7 @@ func TestFindAllPullRequests(t *testing.T) {
 					PullRequests: github.AllPullRequestsPullRequests{
 						Nodes: github.AllPullRequestsNodes{
 							{
+								Author:    github.Author{Login: "user1"},
 								Number:    githubv4.Int(123),
 								URL:       githubv4.String("https://github.com/test/repo/pull/123"),
 								CreatedAt: githubv4.DateTime{Time: createdAt},
@@ -50,8 +51,8 @@ func TestFindAllPullRequests(t *testing.T) {
 								},
 								Participants: github.Participants{
 									Nodes: github.ParticipantsNodes{
-										{URL: githubv4.String("https://github.com/user1")},
-										{URL: githubv4.String("https://github.com/user2")},
+										{URL: githubv4.String("https://github.com/user1"), Login: "user1"},
+										{URL: githubv4.String("https://github.com/user2"), Login: "user2"},
 									},
 								},
 							},
@@ -146,7 +147,7 @@ func TestRepositoryFromURL(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			owner, repo, err := github.RepositoryFromURL(tc.url)
-			
+
 			if tc.expectError {
 				if err == nil {
 					t.Errorf("expected error but got none")
@@ -172,7 +173,7 @@ func TestRepositoryFromURL(t *testing.T) {
 
 func TestAllPullRequestsPagination(t *testing.T) {
 	cache := cachePkg.New()
-	
+
 	createdAt := time.Now().Add(-7 * 24 * time.Hour)
 	mergedAt := time.Now()
 
